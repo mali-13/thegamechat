@@ -22,7 +22,7 @@ export class TeamService {
       )
     }
 
-    const team = new Team()
+    const team = (await this.findOneBy(teamDto.teamId)) || new Team()
     team.name = teamDto.name
     team.about = teamDto.about
     team.creator = creator
@@ -36,5 +36,9 @@ export class TeamService {
         creator: true,
       },
     })
+  }
+
+  async findOneBy(teamId: number) {
+    return this.teamRepository.findOneBy({ teamId })
   }
 }
