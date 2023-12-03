@@ -30,6 +30,11 @@ export class TeamService {
   }
 
   find() {
-    return this.teamRepository.find()
+    return this.teamRepository.find({
+      relations: {
+        players: true,
+        creator: true,
+      },
+    })
   }
 }
