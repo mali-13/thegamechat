@@ -20,4 +20,8 @@ export class PlayerService {
   findPlayers() {
     return this.playerRepository.find()
   }
+
+  findOneBy(playerId: number) {
+    return this.playerRepository.findOneBy({ playerId })
+  }
 }

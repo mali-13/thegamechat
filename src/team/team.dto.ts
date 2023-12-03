@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator'
+import { IsNumber, IsString } from 'class-validator'
 
 export class TeamDto {
   @IsString()
@@ -6,4 +6,7 @@ export class TeamDto {
 
   @IsString()
   about: string
+
+  @IsNumber()
+  creatorId: number
 }
