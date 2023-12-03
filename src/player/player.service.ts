@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { Repository } from 'typeorm'
+import { FindManyOptions, Repository } from 'typeorm'
 import { Player } from './player.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { PlayerDto } from './player.dto'
@@ -17,8 +17,8 @@ export class PlayerService {
     return this.playerRepository.save(player)
   }
 
-  findPlayers() {
-    return this.playerRepository.find()
+  findPlayers(options: FindManyOptions<Player>) {
+    return this.playerRepository.find(options)
   }
 
   findOneBy(playerId: number) {

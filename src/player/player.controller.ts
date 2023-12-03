@@ -13,6 +13,6 @@ export class PlayerController {
 
   @Get('/')
   getPlayers() {
-    return this.playerService.findPlayers()
+    return this.playerService.findPlayers({})
   }
 }
