@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { FindManyOptions, Repository } from 'typeorm'
 import { Player } from './player.entity'
 import { InjectRepository } from '@nestjs/typeorm'
-import { PlayerDto } from './player.dto'
+import { CreatePlayerDto } from './player.dto'
 
 @Injectable()
 export class PlayerService {
@@ -11,7 +11,7 @@ export class PlayerService {
     private readonly playerRepository: Repository<Player>,
   ) {}
 
-  savePlayer(playerDto: PlayerDto) {
+  savePlayer(playerDto: CreatePlayerDto) {
     const player = new Player()
     player.name = playerDto.name
     return this.playerRepository.save(player)

@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { PlayerDto } from '../../player/player.dto'
+import { UpdatePlayerDto } from '../../player/player.dto'
 import { In, Repository } from 'typeorm'
 import { Team } from '../team.entity'
 import { InjectRepository } from '@nestjs/typeorm'
@@ -31,7 +31,7 @@ export class TeamPlayerService {
     return team.players
   }
 
-  async updatePlayers(teamId: number, playersDto: PlayerDto[]) {
+  async updatePlayers(teamId: number, playersDto: UpdatePlayerDto[]) {
     const team = await this.teamRepository.findOneBy({ teamId })
 
     if (!team) {
@@ -83,6 +83,42 @@ export class TeamPlayerService {
       .relation(Team, 'players')
       .of(team)
       .remove(player)
+
+    return player
+  }
+
+  async addPlayer(teamId: number, playerDto: UpdatePlayerDto) {
+    const team = await this.teamRepository.findOne({
+      where: { teamId },
+      relations: {
+        players: true,
+        creator: true,
+      },
+    })
+
+    if (!team) {
+      throw new NotFoundException(
+        'Team not found. The provided team was not found',
+      )
+    }
+
+    let player = team.players.find(
+      (player) => player.playerId === playerDto.playerId,
+    )
+
+    if (player) return player
+
+    player = await this.playerService.findOneBy(playerDto.playerId)
+
+    if (!player) {
+      throw new NotFoundException(
+        `Player not found. Player with id ${playerDto.playerId} was not found`,
+      )
+    }
+
+    team.players.push(player)
+
+    await this.teamRepository.save(team)
 
     return player
   }

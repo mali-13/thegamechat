@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Param, Put } from '@nestjs/common'
+import { Body, Controller, Delete, Param, Post, Put } from '@nestjs/common'
 import { TeamPlayerService } from './team-player.service'
-import { PlayerDto } from '../../player/player.dto'
+import { UpdatePlayerDto } from '../../player/player.dto'
 
 @Controller('teams/:teamId/players')
 export class TeamPlayerController {
@@ -9,9 +9,17 @@ export class TeamPlayerController {
   @Put('/')
   async updatePlayers(
     @Param('teamId') teamId: number,
-    @Body() players: PlayerDto[],
+    @Body() players: UpdatePlayerDto[],
   ) {
     return this.teamPlayerService.updatePlayers(teamId, players)
+  }
+
+  @Post('/')
+  async addPlayer(
+    @Param('teamId') teamId: number,
+    @Body() player: UpdatePlayerDto,
+  ) {
+    return this.teamPlayerService.addPlayer(teamId, player)
   }
 
   @Delete('/:playerId')
