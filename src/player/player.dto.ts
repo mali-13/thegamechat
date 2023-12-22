@@ -1,9 +1,10 @@
-import { IsNumber, IsString } from 'class-validator'
+import { IsNumber, IsOptional, IsString } from 'class-validator'
 import { PartialType } from '@nestjs/mapped-types'
 
 export class CreatePlayerDto {
   @IsNumber()
-  playerId: number
+  @IsOptional()
+  playerId?: number
 
   @IsString()
   name: string

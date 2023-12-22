@@ -4,9 +4,11 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm'
 import { Player } from '../player/player.entity'
+import { InviteCode } from './team-invite-code/invite-code.entity'
 
 @Entity()
 export class Team {
@@ -24,4 +26,7 @@ export class Team {
   @ManyToMany(() => Player, (player) => player.teams)
   @JoinTable()
   players: Player[]
+
+  @OneToMany(() => InviteCode, (inviteCode) => inviteCode.team)
+  inviteCodes: InviteCode[]
 }
