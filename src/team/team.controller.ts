@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post } from '@nestjs/common'
 import { TeamDto } from './team.dto'
 import { TeamService } from './team.service'
 
@@ -14,5 +14,13 @@ export class TeamController {
   @Get('/')
   find() {
     return this.teamService.find()
+  }
+
+  @Get('/:teamId')
+  findById(@Param('teamId') teamId: number) {
+    return this.teamService.findOne({
+      where: { teamId },
+      relations: { players: true, creator: true, inviteCodes: true },
+    })
   }
 }

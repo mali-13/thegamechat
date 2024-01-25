@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { TeamDto } from './team.dto'
 import { Team } from './team.entity'
-import { Repository } from 'typeorm'
+import { FindOneOptions, Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import { PlayerService } from '../player/player.service'
 
@@ -22,7 +22,9 @@ export class TeamService {
       )
     }
 
-    const team = (await this.findOneBy(teamDto.teamId)) || new Team()
+    const team =
+      (await this.teamRepository.findOneBy({ teamId: teamDto.teamId })) ||
+      new Team()
     team.name = teamDto.name
     team.about = teamDto.about
     team.creator = creator
@@ -38,7 +40,7 @@ export class TeamService {
     })
   }
 
-  async findOneBy(teamId: number) {
-    return this.teamRepository.findOneBy({ teamId })
+  async findOne(options: FindOneOptions<Team>): Promise<Team> {
+    return this.teamRepository.findOne(options)
   }
 }

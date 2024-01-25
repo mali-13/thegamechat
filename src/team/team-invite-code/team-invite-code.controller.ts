@@ -1,4 +1,4 @@
-import { Controller, Get, Post } from '@nestjs/common'
+import { Controller, Get, Param, Post } from '@nestjs/common'
 import { TeamInviteCodeService } from './team-invite-code.service'
 
 @Controller('teams/:teamId/invite-codes')
@@ -6,12 +6,13 @@ export class TeamInviteCodeController {
   constructor(readonly teamInviteCodeService: TeamInviteCodeService) {}
 
   @Get('')
-  async findInviteCodes() {
-    return []
+  async findInviteCodes(@Param('teamId') teamId: number) {
+    console.log('teamId', teamId)
+    return this.teamInviteCodeService.findInviteCodes(teamId)
   }
 
   @Post('/')
-  async addInviteCode(teamId: number) {
+  async addInviteCode(@Param('teamId') teamId: number) {
     return this.teamInviteCodeService.addInviteCode(teamId)
   }
 }

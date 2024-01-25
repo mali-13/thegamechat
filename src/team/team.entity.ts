@@ -27,6 +27,8 @@ export class Team {
   @JoinTable()
   players: Player[]
 
-  @OneToMany(() => InviteCode, (inviteCode) => inviteCode.team)
+  @OneToMany(() => InviteCode, (inviteCode) => inviteCode.team, {
+    cascade: true,
+  })
   inviteCodes: InviteCode[]
 }

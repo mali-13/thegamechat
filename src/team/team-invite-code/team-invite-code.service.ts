@@ -12,12 +12,11 @@ export class TeamInviteCodeService {
     private readonly teamRepository: Repository<Team>,
   ) {}
 
-  async findPlayers(teamId: number) {
+  async findInviteCodes(teamId: number) {
     const team = await this.teamRepository.findOne({
       where: { teamId },
       relations: {
-        players: true,
-        creator: true,
+        inviteCodes: true,
       },
     })
 
@@ -27,7 +26,7 @@ export class TeamInviteCodeService {
       )
     }
 
-    return team.players
+    return team.inviteCodes
   }
 
   async addInviteCode(teamId: number) {
