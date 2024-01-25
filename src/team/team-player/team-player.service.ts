@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import { UpdatePlayerDto } from '../../player/player.dto'
 import { In, Repository } from 'typeorm'
 import { Team } from '../team.entity'
@@ -87,18 +91,33 @@ export class TeamPlayerService {
     return player
   }
 
-  async addPlayer(teamId: number, playerDto: UpdatePlayerDto) {
+  async addPlayer(
+    teamId: number,
+    playerDto: UpdatePlayerDto,
+    inviteCode?: string,
+  ) {
     const team = await this.teamRepository.findOne({
       where: { teamId },
       relations: {
         players: true,
         creator: true,
+        inviteCodes: true,
       },
     })
 
     if (!team) {
       throw new NotFoundException(
         'Team not found. The provided team was not found',
+      )
+    }
+
+    const invalidInviteCode = !team.inviteCodes.some(
+      (code) => code.code === inviteCode,
+    )
+
+    if (inviteCode && invalidInviteCode) {
+      throw new BadRequestException(
+        `Invalid invite code. Team ${teamId} does not have ${inviteCode} as an invite code`,
       )
     }
 
