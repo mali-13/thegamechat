@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { TeamModule } from './team/team.module'
 import { TeamPlayerModule } from './team/team-player/team-player.module'
 import { TeamInviteCodeModule } from './team/team-invite-code/team-invite-code.module'
+import { MattermostModule } from './mattermost.module'
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { TeamInviteCodeModule } from './team/team-invite-code/team-invite-code.m
     TeamModule,
     TeamPlayerModule,
     TeamInviteCodeModule,
+    MattermostModule,
   ],
 })
 export class AppModule {}
