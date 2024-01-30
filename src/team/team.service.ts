@@ -5,6 +5,7 @@ import { FindOneOptions, Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import { PlayerService } from '../player/player.service'
 import { Mattermost } from '../mattermost.module'
+import { uuid } from 'short-uuid'
 
 @Injectable()
 export class TeamService {
@@ -16,6 +17,21 @@ export class TeamService {
   ) {}
 
   async save(teamDto: TeamDto) {
+    const team = await this.teamRepository.findOneBy({ teamId: teamDto.teamId })
+
+    if (!team) {
+      throw new NotFoundException(
+        `Team not found. There is not team with id:${teamDto.teamId}`,
+      )
+    }
+
+    team.name = teamDto.name
+    team.about = teamDto.about
+
+    return this.teamRepository.save(team)
+  }
+
+  async create(teamDto: TeamDto) {
     const creator = await this.playerService.findOneBy(teamDto.creatorId)
 
     if (!creator) {
@@ -24,13 +40,29 @@ export class TeamService {
       )
     }
 
-    const team =
-      (await this.teamRepository.findOneBy({ teamId: teamDto.teamId })) ||
-      new Team()
+    const team = new Team()
     team.name = teamDto.name
     team.about = teamDto.about
     team.creator = creator
-    return this.teamRepository.save(team)
+
+    const mattermostTeamName =
+      teamDto.name.replaceAll(' ', '-').toLowerCase() + '-' + uuid()
+
+    const teamChannel = await this.mattermost.createChannel(
+      // @ts-expect-error send only required values
+      {
+        team_id: 'mcke6xmek3dszcdspnrptcsdmy',
+        name: mattermostTeamName,
+        display_name: teamDto.name,
+        type: 'P',
+      },
+    )
+
+    team.channelId = teamChannel.id
+
+    await this.mattermost.addToChannel(creator.mattermostUserId, teamChannel.id)
+
+    return this.teamRepository.create(team)
   }
 
   find() {

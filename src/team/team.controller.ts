@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common'
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common'
 import { TeamDto } from './team.dto'
 import { TeamService } from './team.service'
 
@@ -7,7 +7,12 @@ export class TeamController {
   constructor(private readonly teamService: TeamService) {}
 
   @Post('/')
-  save(@Body() teamDto: TeamDto) {
+  create(@Body() teamDto: TeamDto) {
+    return this.teamService.create(teamDto)
+  }
+
+  @Patch('/')
+  patch(@Body() teamDto: TeamDto) {
     return this.teamService.save(teamDto)
   }
 

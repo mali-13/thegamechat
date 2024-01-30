@@ -28,6 +28,10 @@ export class PlayerService {
       '',
     )
 
+    await this.mattermost.addUsersToTeam('mcke6xmek3dszcdspnrptcsdmy', [
+      mattermostUser.id,
+    ])
+
     const player = new Player()
     player.name = playerDto.name
     player.mattermostUserId = mattermostUser.id

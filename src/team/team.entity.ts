@@ -19,6 +19,8 @@ export class Team {
   name: string
   @Column()
   about: string
+  @Column()
+  channelId: string
 
   @ManyToOne(() => Player, (player) => player.createdTeams)
   creator: Player
