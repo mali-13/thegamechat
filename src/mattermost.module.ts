@@ -1,19 +1,21 @@
 import { Client4 } from '@mattermost/client'
 import { Global, Module } from '@nestjs/common'
 
+export class Mattermost extends Client4 {}
+
 @Global()
 @Module({
   providers: [
     {
-      provide: 'Mattermost',
+      provide: Mattermost,
       useFactory: async () => {
-        const client4 = new Client4()
-        client4.setUrl('http://localhost:8065')
-        client4.setToken('irdib7uhkjyjpkpcdz6ap54qny')
-        return client4
+        const mattermost = new Mattermost()
+        mattermost.setUrl('http://localhost:8065')
+        mattermost.setToken('irdib7uhkjyjpkpcdz6ap54qny')
+        return mattermost
       },
     },
   ],
-  exports: ['Mattermost'],
+  exports: [Mattermost],
 })
 export class MattermostModule {}

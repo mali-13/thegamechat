@@ -4,6 +4,7 @@ import { Team } from './team.entity'
 import { FindOneOptions, Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import { PlayerService } from '../player/player.service'
+import { Mattermost } from '../mattermost.module'
 
 @Injectable()
 export class TeamService {
@@ -11,6 +12,7 @@ export class TeamService {
     @InjectRepository(Team)
     private readonly teamRepository: Repository<Team>,
     private readonly playerService: PlayerService,
+    private readonly mattermost: Mattermost,
   ) {}
 
   async save(teamDto: TeamDto) {

@@ -1,15 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { FindManyOptions, Repository } from 'typeorm'
 import { Player } from './player.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { CreatePlayerDto } from './player.dto'
-import { Client4 as Mattermost } from '@mattermost/client'
 import { uuid } from 'short-uuid'
+import { Mattermost } from '../mattermost.module'
 
 @Injectable()
 export class PlayerService {
   constructor(
-    @Inject('Mattermost')
     private readonly mattermost: Mattermost,
     @InjectRepository(Player)
     private readonly playerRepository: Repository<Player>,
