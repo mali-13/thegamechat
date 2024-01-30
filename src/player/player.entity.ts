@@ -20,4 +20,7 @@ export class Player {
 
   @ManyToMany(() => Team, (team) => team.players)
   teams: Team[]
+
+  @Column()
+  mattermostUserId: string
 }

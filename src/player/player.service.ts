@@ -4,6 +4,7 @@ import { Player } from './player.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { CreatePlayerDto } from './player.dto'
 import { Client4 as Mattermost } from '@mattermost/client'
+import { uuid } from 'short-uuid'
 
 @Injectable()
 export class PlayerService {
@@ -15,27 +16,23 @@ export class PlayerService {
   ) {}
 
   async savePlayer(playerDto: CreatePlayerDto) {
-    try {
-      const mattermostUser = await this.mattermost.createUser(
-        // @ts-ignore
-        {
-          email: `${playerDto.name}@generated.com`,
-          username: `${playerDto.name}`,
-          password: '12345Mm',
-        },
-        '',
-        '',
-      )
+    const username = `${playerDto.name}-${uuid()}`
 
-      console.log(mattermostUser)
-    } catch (err) {
-      console.log(err)
-    }
+    const mattermostUser = await this.mattermost.createUser(
+      // @ts-expect-error send only required fields
+      {
+        email: `${username}@generated.com`,
+        username: `${username}`,
+        password: playerDto.password,
+      },
+      '',
+      '',
+    )
 
     const player = new Player()
     player.name = playerDto.name
-    // const savedPlayer = await this.playerRepository.save(player)
-    return null
+    player.mattermostUserId = mattermostUser.id
+    return await this.playerRepository.save(player)
   }
 
   findPlayers(options: FindManyOptions<Player>) {

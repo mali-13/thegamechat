@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator'
+import { IsNumber, IsOptional, IsString, MinLength } from 'class-validator'
 import { PartialType } from '@nestjs/mapped-types'
 
 export class CreatePlayerDto {
@@ -8,6 +8,9 @@ export class CreatePlayerDto {
 
   @IsString()
   name: string
+
+  @MinLength(6)
+  password: string
 }
 
 export class UpdatePlayerDto extends PartialType(CreatePlayerDto) {}
