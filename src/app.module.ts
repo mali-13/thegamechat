@@ -4,7 +4,9 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { TeamModule } from './team/team.module'
 import { TeamPlayerModule } from './team/team-player/team-player.module'
 import { TeamInviteCodeModule } from './team/team-invite-code/team-invite-code.module'
-import { MattermostModule } from './mattermost.module'
+import { MattermostModule } from './mattermost/mattermost.module'
+import { ConfigModule } from '@nestjs/config'
+import mattermostConfig from './mattermost/mattermost.config'
 
 @Module({
   imports: [
@@ -23,6 +25,10 @@ import { MattermostModule } from './mattermost.module'
     TeamPlayerModule,
     TeamInviteCodeModule,
     MattermostModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [mattermostConfig],
+    }),
   ],
 })
 export class AppModule {}

@@ -4,7 +4,7 @@ import { Team } from './team.entity'
 import { FindOneOptions, Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import { PlayerService } from '../player/player.service'
-import { Mattermost } from '../mattermost.module'
+import { Mattermost } from '../mattermost/mattermost.module'
 import { uuid } from 'short-uuid'
 
 @Injectable()
@@ -51,7 +51,7 @@ export class TeamService {
     const teamChannel = await this.mattermost.createChannel(
       // @ts-expect-error send only required values
       {
-        team_id: 'mcke6xmek3dszcdspnrptcsdmy',
+        team_id: this.mattermost.config.teamId,
         name: mattermostTeamName,
         display_name: teamDto.name,
         type: 'P',

@@ -4,7 +4,7 @@ import { Player } from './player.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { CreatePlayerDto } from './player.dto'
 import { uuid } from 'short-uuid'
-import { Mattermost } from '../mattermost.module'
+import { Mattermost } from '../mattermost/mattermost.module'
 
 @Injectable()
 export class PlayerService {
@@ -28,7 +28,7 @@ export class PlayerService {
       '',
     )
 
-    await this.mattermost.addUsersToTeam('mcke6xmek3dszcdspnrptcsdmy', [
+    await this.mattermost.addUsersToTeam(this.mattermost.config.teamId, [
       mattermostUser.id,
     ])
 
