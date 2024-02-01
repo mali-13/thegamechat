@@ -1,12 +1,12 @@
-import { TeamDto } from './team.dto'
+import { TeamDto } from '../team.dto'
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { Team } from './team.entity'
+import { Team } from '../team.entity'
 import { uuid } from 'short-uuid'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { PlayerService } from '../player/player.service'
-import { Mattermost } from '../mattermost/mattermost.service'
-import { TeamPlayerService } from './team-player/team-player.service'
+import { PlayerService } from '../../player/player.service'
+import { Mattermost } from '../../mattermost/mattermost.service'
+import { TeamPlayerService } from '../team-player/team-player.service'
 
 @Injectable()
 export class TeamCreatorService {

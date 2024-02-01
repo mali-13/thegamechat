@@ -1,19 +1,10 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common'
+import { Body, Controller, Get, Param, Patch } from '@nestjs/common'
 import { TeamDto } from './team.dto'
 import { TeamService } from './team.service'
-import { TeamCreatorService } from './team-creator.service'
 
 @Controller('teams')
 export class TeamController {
-  constructor(
-    private readonly teamService: TeamService,
-    private readonly teamCreatorService: TeamCreatorService,
-  ) {}
-
-  @Post('/')
-  create(@Body() teamDto: TeamDto) {
-    return this.teamCreatorService.create(teamDto)
-  }
+  constructor(private readonly teamService: TeamService) {}
 
   @Patch('/')
   patch(@Body() teamDto: TeamDto) {
