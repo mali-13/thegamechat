@@ -4,7 +4,7 @@ import { Player } from './player.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { CreatePlayerDto } from './player.dto'
 import { uuid } from 'short-uuid'
-import { Mattermost } from '../mattermost/mattermost.module'
+import { Mattermost } from '../mattermost/mattermost.service'
 
 @Injectable()
 export class PlayerService {
