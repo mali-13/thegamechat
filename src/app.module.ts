@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common'
 import { PlayerModule } from './player/player.module'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { TeamModule } from './team/team.module'
-import { TeamPlayerModule } from './team/team-player/team-player.module'
 import { TeamInviteCodeModule } from './team/team-invite-code/team-invite-code.module'
 import { MattermostModule } from './mattermost/mattermost.module'
 import { ConfigModule } from '@nestjs/config'
@@ -22,7 +21,6 @@ import mattermostConfig from './mattermost/mattermost.config'
     }),
     PlayerModule,
     TeamModule,
-    TeamPlayerModule,
     TeamInviteCodeModule,
     MattermostModule,
     ConfigModule.forRoot({
