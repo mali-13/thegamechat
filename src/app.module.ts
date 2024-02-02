@@ -6,6 +6,7 @@ import { TeamInviteCodeModule } from './team/team-invite-code/team-invite-code.m
 import { MattermostModule } from './mattermost/mattermost.module'
 import { ConfigModule } from '@nestjs/config'
 import mattermostConfig from './mattermost/mattermost.config'
+import { ChallengeModule } from './challenge/challenge.module'
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import mattermostConfig from './mattermost/mattermost.config'
     TeamModule,
     TeamInviteCodeModule,
     MattermostModule,
+    ChallengeModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [mattermostConfig],

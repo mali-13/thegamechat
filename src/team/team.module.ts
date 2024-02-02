@@ -13,5 +13,6 @@ import { TeamCreatorController } from './team-creator/team-creator.controller'
   imports: [TypeOrmModule.forFeature([Team]), PlayerModule],
   controllers: [TeamController, TeamPlayerController, TeamCreatorController],
   providers: [TeamService, TeamCreatorService, TeamPlayerService],
+  exports: [TeamService],
 })
 export class TeamModule {}
