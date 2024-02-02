@@ -7,6 +7,7 @@ import { MattermostModule } from './mattermost/mattermost.module'
 import { ConfigModule } from '@nestjs/config'
 import mattermostConfig from './mattermost/mattermost.config'
 import { ChallengeModule } from './challenge/challenge.module'
+import { TeamChallengeModule } from './team/team-challenge/team-challenge.module'
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ChallengeModule } from './challenge/challenge.module'
     PlayerModule,
     TeamModule,
     TeamInviteCodeModule,
+    TeamChallengeModule,
     MattermostModule,
     ChallengeModule,
     ConfigModule.forRoot({

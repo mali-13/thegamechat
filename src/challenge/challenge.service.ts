@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { ChallengeDto } from './challenge.dto'
 import { TeamService } from '../team/team.service'
 import { Challenge, ChallengeStatus } from './challenge.entity'
-import { Repository } from 'typeorm'
+import { FindManyOptions, Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 
 @Injectable()
@@ -41,5 +41,9 @@ export class ChallengeService {
     challenge.message = challengeDto.message
 
     return this.challengeRepository.save(challenge)
+  }
+
+  find(options: FindManyOptions<Challenge>) {
+    return this.challengeRepository.find(options)
   }
 }
