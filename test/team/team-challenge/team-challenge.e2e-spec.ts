@@ -12,9 +12,11 @@ import {
 } from '../../../src/challenge/challenge.entity'
 import { Repository } from 'typeorm'
 import { getRepositoryToken } from '@nestjs/typeorm'
+import { GameChatService } from '../../../src/game-chat/game-chat.service'
 
 describe('TeamChallengeController (e2e)', () => {
   let app: INestApplication
+  let gameChatService
   let challengeRepository
 
   beforeAll(async () => {
@@ -25,9 +27,13 @@ describe('TeamChallengeController (e2e)', () => {
     app = moduleFixture.createNestApplication()
     await app.init()
 
+    gameChatService = app.get<GameChatService>(GameChatService)
+
     challengeRepository = app.get<Repository<Challenge>>(
       getRepositoryToken(Challenge),
     )
+
+    jest.spyOn(gameChatService, 'create').mockResolvedValue(null)
   })
 
   it('/teams/:teamId/challenges (Post)', async () => {
