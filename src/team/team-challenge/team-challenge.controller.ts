@@ -5,10 +5,11 @@ import {
   ForbiddenException,
   Get,
   Param,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common'
-import { ChallengeDto } from '../../challenge/challenge.dto'
+import { ChallengeDto, UpdateChallengeDto } from '../../challenge/challenge.dto'
 import { ChallengeFindOptionDto } from './team-challenge.dto'
 
 @Controller('teams/:teamId/challenges')
@@ -32,5 +33,14 @@ export class TeamChallengeController {
     @Query() findOptions: ChallengeFindOptionDto,
   ) {
     return this.teamChallengeService.find(teamId, findOptions)
+  }
+
+  @Patch('/:challengeId')
+  save(
+    @Param('challengeId') challengeId: number,
+    @Param('teamId') teamId: number,
+    @Body() challengeDto: UpdateChallengeDto,
+  ) {
+    return this.teamChallengeService.save(challengeDto)
   }
 }

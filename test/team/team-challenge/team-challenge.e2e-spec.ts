@@ -2,7 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
 import { AppModule } from '../../../src/app.module'
-import { ChallengeDto } from '../../../src/challenge/challenge.dto'
+import {
+  ChallengeDto,
+  UpdateChallengeDto,
+} from '../../../src/challenge/challenge.dto'
 import {
   Challenge,
   ChallengeStatus,
@@ -10,38 +13,9 @@ import {
 import { Repository } from 'typeorm'
 import { getRepositoryToken } from '@nestjs/typeorm'
 
-async function insertChallenges(app: INestApplication) {
-  const challengeRepository = app.get<Repository<Challenge>>(
-    getRepositoryToken(Challenge),
-  )
-
-  await challengeRepository.save([
-    {
-      challengeId: 1,
-      challengerTeamId: 1,
-      challengedTeamId: 2,
-      message: `Are you up for a game?`,
-      status: ChallengeStatus.PENDING,
-    },
-    {
-      challengeId: 2,
-      challengerTeamId: 1,
-      challengedTeamId: 2,
-      message: `Are you up for a game?`,
-      status: ChallengeStatus.REJECTED,
-    },
-    {
-      challengeId: 3,
-      challengerTeamId: 2,
-      challengedTeamId: 1,
-      message: `Are you up for a game?`,
-      status: ChallengeStatus.PENDING,
-    },
-  ])
-}
-
 describe('TeamChallengeController (e2e)', () => {
   let app: INestApplication
+  let challengeRepository
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -51,7 +25,9 @@ describe('TeamChallengeController (e2e)', () => {
     app = moduleFixture.createNestApplication()
     await app.init()
 
-    insertChallenges(app)
+    challengeRepository = app.get<Repository<Challenge>>(
+      getRepositoryToken(Challenge),
+    )
   })
 
   it('/teams/:teamId/challenges (Post)', async () => {
@@ -74,84 +50,116 @@ describe('TeamChallengeController (e2e)', () => {
     })
   })
 
-  it('/teams/:teamId/challenges (GET)', async () => {
-    const teamId = 1
+  it('/teams/:teamId/challenges (PUT)', async () => {
+    await challengeRepository.save({
+      challengeId: 4,
+      challengerTeamId: 1,
+      challengedTeamId: 2,
+      message: `Are you up for a game?`,
+      status: ChallengeStatus.PENDING,
+    })
 
-    const { body: challenges } = await request(app.getHttpServer())
-      .get(`/teams/${teamId}/challenges`)
+    const challengeDto: UpdateChallengeDto = {
+      challengeId: 4,
+      status: ChallengeStatus.ACCEPTED,
+      challengerTeamId: 1,
+    }
+
+    const { body: challenge } = await request(app.getHttpServer())
+      .patch(
+        `/teams/${challengeDto.challengerTeamId}/challenges/${challengeDto.challengeId}`,
+      )
+      .send(challengeDto)
       .expect(200)
 
-    const expectedChallenges = [
-      {
-        challengerTeamId: 1,
-        challengedTeamId: 2,
-        message: `Are you up for a game?`,
-        status: ChallengeStatus.PENDING,
-        madeOn: expect.any(String),
-        challengeId: expect.any(Number),
-      },
-    ]
-
-    expect(challenges).toEqual(expect.arrayContaining(expectedChallenges))
+    expect(challenge.status).toEqual(ChallengeStatus.ACCEPTED)
   })
 
-  it('/teams/:teamId/challenges?challenger=true (GET)', async () => {
-    const teamId = 1
+  describe('/teams/:teamId/challenges (GET)', () => {
+    beforeAll(async () => {
+      await challengeRepository.save([
+        {
+          challengeId: 1,
+          challengerTeamId: 1,
+          challengedTeamId: 2,
+          message: `Are you up for a game?`,
+          status: ChallengeStatus.PENDING,
+        },
+        {
+          challengeId: 2,
+          challengerTeamId: 1,
+          challengedTeamId: 2,
+          message: `Are you up for a game?`,
+          status: ChallengeStatus.REJECTED,
+        },
+        {
+          challengeId: 3,
+          challengerTeamId: 2,
+          challengedTeamId: 1,
+          message: `Are you up for a game?`,
+          status: ChallengeStatus.PENDING,
+        },
+      ])
+    })
 
-    const { body: challenges } = await request(app.getHttpServer())
-      .get(`/teams/${teamId}/challenges`)
-      .query({ challenger: true })
-      .expect(200)
+    it('/teams/:teamId/challenges?challenger=true (GET)', async () => {
+      const teamId = 1
 
-    const anyChallenger = challenges.some(
-      (challenge: Challenge) => challenge.challengerTeamId === teamId,
-    )
+      const { body: challenges } = await request(app.getHttpServer())
+        .get(`/teams/${teamId}/challenges`)
+        .query({ challenger: true })
+        .expect(200)
 
-    const anyChallenged = challenges.some(
-      (challenge: Challenge) => challenge.challengedTeamId === teamId,
-    )
+      const anyChallenger = challenges.some(
+        (challenge: Challenge) => challenge.challengerTeamId === teamId,
+      )
 
-    expect(anyChallenger).toBe(true)
-    expect(anyChallenged).toBe(false)
-  })
+      const anyChallenged = challenges.some(
+        (challenge: Challenge) => challenge.challengedTeamId === teamId,
+      )
 
-  it('/teams/:teamId/challenges?challenged=true (GET)', async () => {
-    const teamId = 1
+      expect(anyChallenger).toBe(true)
+      expect(anyChallenged).toBe(false)
+    })
 
-    const { body: challenges } = await request(app.getHttpServer())
-      .get(`/teams/${teamId}/challenges`)
-      .query({ challenged: true })
-      .expect(200)
+    it('/teams/:teamId/challenges?challenged=true (GET)', async () => {
+      const teamId = 1
 
-    const anyChallenger = challenges.some(
-      (challenge: Challenge) => challenge.challengerTeamId === teamId,
-    )
+      const { body: challenges } = await request(app.getHttpServer())
+        .get(`/teams/${teamId}/challenges`)
+        .query({ challenged: true })
+        .expect(200)
 
-    const anyChallenged = challenges.some(
-      (challenge: Challenge) => challenge.challengedTeamId === teamId,
-    )
+      const anyChallenger = challenges.some(
+        (challenge: Challenge) => challenge.challengerTeamId === teamId,
+      )
 
-    expect(anyChallenger).toBe(false)
-    expect(anyChallenged).toBe(true)
-  })
+      const anyChallenged = challenges.some(
+        (challenge: Challenge) => challenge.challengedTeamId === teamId,
+      )
 
-  it('/teams/:teamId/challenges?status=pending (GET)', async () => {
-    const teamId = 1
+      expect(anyChallenger).toBe(false)
+      expect(anyChallenged).toBe(true)
+    })
 
-    const { body: challenges } = await request(app.getHttpServer())
-      .get(`/teams/${teamId}/challenges`)
-      .query({ status: 'pending' })
-      .expect(200)
+    it('/teams/:teamId/challenges?status=pending (GET)', async () => {
+      const teamId = 1
 
-    const anyWithPendingStatus = challenges.some(
-      (challenge) => challenge.status === ChallengeStatus.PENDING,
-    )
+      const { body: challenges } = await request(app.getHttpServer())
+        .get(`/teams/${teamId}/challenges`)
+        .query({ status: 'pending' })
+        .expect(200)
 
-    const anyWithWrongStatus = challenges.some(
-      (challenge) => challenge.status !== ChallengeStatus.PENDING,
-    )
+      const anyWithPendingStatus = challenges.some(
+        (challenge) => challenge.status === ChallengeStatus.PENDING,
+      )
 
-    expect(anyWithPendingStatus).toBe(true)
-    expect(anyWithWrongStatus).toBe(false)
+      const anyWithWrongStatus = challenges.some(
+        (challenge) => challenge.status !== ChallengeStatus.PENDING,
+      )
+
+      expect(anyWithPendingStatus).toBe(true)
+      expect(anyWithWrongStatus).toBe(false)
+    })
   })
 })
