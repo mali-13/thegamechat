@@ -9,9 +9,17 @@ import mattermostConfig from './mattermost/mattermost.config'
 import { ChallengeModule } from './challenge/challenge.module'
 import { TeamChallengeModule } from './team/team-challenge/team-challenge.module'
 import { APP_PIPE } from '@nestjs/core'
+import { GameChatModule } from './game-chat/game-chat.module'
 
 @Module({
   imports: [
+    PlayerModule,
+    TeamModule,
+    TeamInviteCodeModule,
+    TeamChallengeModule,
+    MattermostModule,
+    ChallengeModule,
+    GameChatModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
@@ -22,12 +30,6 @@ import { APP_PIPE } from '@nestjs/core'
       autoLoadEntities: true,
       synchronize: true,
     }),
-    PlayerModule,
-    TeamModule,
-    TeamInviteCodeModule,
-    TeamChallengeModule,
-    MattermostModule,
-    ChallengeModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [mattermostConfig],
