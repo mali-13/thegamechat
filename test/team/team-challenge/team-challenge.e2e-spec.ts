@@ -10,14 +10,12 @@ import {
   Challenge,
   ChallengeStatus,
 } from '../../../src/challenge/challenge.entity'
-import { Repository } from 'typeorm'
-import { getRepositoryToken } from '@nestjs/typeorm'
 import { GameChatService } from '../../../src/game-chat/game-chat.service'
+import { createChallenge } from './team-challenge.test-data'
 
 describe('TeamChallengeController (e2e)', () => {
   let app: INestApplication
   let gameChatService
-  let challengeRepository
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -28,10 +26,6 @@ describe('TeamChallengeController (e2e)', () => {
     await app.init()
 
     gameChatService = app.get<GameChatService>(GameChatService)
-
-    challengeRepository = app.get<Repository<Challenge>>(
-      getRepositoryToken(Challenge),
-    )
 
     jest.spyOn(gameChatService, 'create').mockResolvedValue(null)
   })
@@ -57,13 +51,15 @@ describe('TeamChallengeController (e2e)', () => {
   })
 
   it('/teams/:teamId/challenges (PUT)', async () => {
-    await challengeRepository.save({
-      challengeId: 4,
-      challengerTeamId: 1,
-      challengedTeamId: 2,
-      message: `Are you up for a game?`,
-      status: ChallengeStatus.PENDING,
-    })
+    await createChallenge(
+      {
+        challengeId: 4,
+        challengerTeamId: 1,
+        challengedTeamId: 2,
+        status: ChallengeStatus.PENDING,
+      },
+      app,
+    )
 
     const challengeDto: UpdateChallengeDto = {
       challengeId: 4,
@@ -83,7 +79,7 @@ describe('TeamChallengeController (e2e)', () => {
 
   describe('/teams/:teamId/challenges (GET)', () => {
     beforeAll(async () => {
-      await challengeRepository.save([
+      await createChallenge(
         {
           challengeId: 1,
           challengerTeamId: 1,
@@ -91,6 +87,10 @@ describe('TeamChallengeController (e2e)', () => {
           message: `Are you up for a game?`,
           status: ChallengeStatus.PENDING,
         },
+        app,
+      )
+
+      await createChallenge(
         {
           challengeId: 2,
           challengerTeamId: 1,
@@ -98,6 +98,10 @@ describe('TeamChallengeController (e2e)', () => {
           message: `Are you up for a game?`,
           status: ChallengeStatus.REJECTED,
         },
+        app,
+      )
+
+      await createChallenge(
         {
           challengeId: 3,
           challengerTeamId: 2,
@@ -105,7 +109,8 @@ describe('TeamChallengeController (e2e)', () => {
           message: `Are you up for a game?`,
           status: ChallengeStatus.PENDING,
         },
-      ])
+        app,
+      )
     })
 
     it('/teams/:teamId/challenges?challenger=true (GET)', async () => {

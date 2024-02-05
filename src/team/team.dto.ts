@@ -3,7 +3,7 @@ import { IsNumber, IsOptional, IsString } from 'class-validator'
 export class TeamDto {
   @IsNumber()
   @IsOptional()
-  teamId: number
+  teamId?: number
 
   @IsString()
   name: string
