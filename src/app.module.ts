@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { Module, ValidationPipe } from '@nestjs/common'
 import { PlayerModule } from './player/player.module'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { TeamModule } from './team/team.module'
@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config'
 import mattermostConfig from './mattermost/mattermost.config'
 import { ChallengeModule } from './challenge/challenge.module'
 import { TeamChallengeModule } from './team/team-challenge/team-challenge.module'
+import { APP_PIPE } from '@nestjs/core'
 
 @Module({
   imports: [
@@ -31,6 +32,15 @@ import { TeamChallengeModule } from './team/team-challenge/team-challenge.module
       isGlobal: true,
       load: [mattermostConfig],
     }),
+  ],
+  providers: [
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        transform: true,
+        transformOptions: { enableImplicitConversion: true },
+      }),
+    },
   ],
 })
 export class AppModule {}

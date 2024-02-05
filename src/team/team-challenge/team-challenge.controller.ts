@@ -6,8 +6,10 @@ import {
   Get,
   Param,
   Post,
+  Query,
 } from '@nestjs/common'
 import { ChallengeDto } from '../../challenge/challenge.dto'
+import { ChallengeFindOptionDto } from './team-challenge.dto'
 
 @Controller('teams/:teamId/challenges')
 export class TeamChallengeController {
@@ -25,7 +27,10 @@ export class TeamChallengeController {
   }
 
   @Get('/')
-  find(@Param('teamId') teamId: number) {
-    return this.teamChallengeService.find(teamId)
+  find(
+    @Param('teamId') teamId: number,
+    @Query() findOptions: ChallengeFindOptionDto,
+  ) {
+    return this.teamChallengeService.find(teamId, findOptions)
   }
 }

@@ -6,9 +6,9 @@ import {
 } from 'typeorm'
 
 export enum ChallengeStatus {
-  PENDING = 'PENDING',
-  ACCEPTED = 'ACCEPTED',
-  REJECTED = 'REJECTED',
+  PENDING = 'pending',
+  ACCEPTED = 'accepted',
+  REJECTED = 'rejected',
 }
 
 @Entity()
