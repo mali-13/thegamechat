@@ -1,9 +1,6 @@
 import { INestApplication } from '@nestjs/common'
 import { Repository } from 'typeorm'
-import {
-  Challenge,
-  ChallengeStatus,
-} from '../../../src/challenge/challenge.entity'
+import { Challenge, ChallengeStatus } from '../../challenge/challenge.entity'
 import { getRepositoryToken } from '@nestjs/typeorm'
 
 const defaultChallenge: Partial<Challenge> = {

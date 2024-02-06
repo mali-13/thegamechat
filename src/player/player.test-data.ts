@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common'
-import { PlayerService } from '../../src/player/player.service'
-import { CreatePlayerDto } from '../../src/player/player.dto'
+import { PlayerService } from './player.service'
+import { CreatePlayerDto } from './player.dto'
 
 const defaultPlayer: CreatePlayerDto = {
   name: 'Eric Fromm',

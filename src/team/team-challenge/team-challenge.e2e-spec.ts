@@ -1,16 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
-import { AppModule } from '../../../src/app.module'
-import {
-  ChallengeDto,
-  UpdateChallengeDto,
-} from '../../../src/challenge/challenge.dto'
-import {
-  Challenge,
-  ChallengeStatus,
-} from '../../../src/challenge/challenge.entity'
-import { GameChatService } from '../../../src/game-chat/game-chat.service'
+import { AppModule } from '../../app.module'
+import { ChallengeDto, UpdateChallengeDto } from '../../challenge/challenge.dto'
+import { Challenge, ChallengeStatus } from '../../challenge/challenge.entity'
+import { GameChatService } from '../../game-chat/game-chat.service'
 import { createChallenge } from './team-challenge.test-data'
 
 describe('TeamChallengeController (e2e)', () => {

@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { INestApplication } from '@nestjs/common'
-import { AppModule } from '../../src/app.module'
-import { GameChatService } from '../../src/game-chat/game-chat.service'
+import { AppModule } from '../app.module'
+import { GameChatService } from './game-chat.service'
 import { createPlayer } from '../player/player.test-data'
 import { createTeam } from '../team/team.test-data'
 import { createChallenge } from '../team/team-challenge/team-challenge.test-data'
-import { ChallengeStatus } from '../../src/challenge/challenge.entity'
+import { ChallengeStatus } from '../challenge/challenge.entity'
 
 describe('GameChatService (e2e)', () => {
   let app: INestApplication

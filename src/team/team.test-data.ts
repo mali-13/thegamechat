@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common'
-import { TeamCreatorService } from '../../src/team/team-creator/team-creator.service'
-import { TeamDto } from '../../src/team/team.dto'
+import { TeamCreatorService } from './team-creator/team-creator.service'
+import { TeamDto } from './team.dto'
 
 const defaultTeam: TeamDto = {
   about: 'The killer team from Kosovo',
