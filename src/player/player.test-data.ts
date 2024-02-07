@@ -1,20 +1,20 @@
-import { INestApplication } from '@nestjs/common'
 import { PlayerService } from './player.service'
 import { CreatePlayerDto } from './player.dto'
+import { Injectable } from '@nestjs/common'
 
-const defaultPlayer: CreatePlayerDto = {
-  name: 'Eric Fromm',
-  password: '555222',
-}
+@Injectable()
+export class PlayerTestData {
+  defaultPlayer: CreatePlayerDto = {
+    name: 'Eric Fromm',
+    password: '555222',
+  }
 
-export function createPlayer(
-  player: Partial<CreatePlayerDto>,
-  app: INestApplication,
-) {
-  const playerService = app.get<PlayerService>(PlayerService)
+  constructor(private readonly playerService: PlayerService) {}
 
-  return playerService.savePlayer({
-    ...defaultPlayer,
-    ...player,
-  })
+  createPlayer(player: Partial<CreatePlayerDto>) {
+    return this.playerService.savePlayer({
+      ...this.defaultPlayer,
+      ...player,
+    })
+  }
 }

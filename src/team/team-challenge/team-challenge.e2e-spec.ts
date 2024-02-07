@@ -5,21 +5,29 @@ import { AppModule } from '../../app.module'
 import { ChallengeDto, UpdateChallengeDto } from '../../challenge/challenge.dto'
 import { Challenge, ChallengeStatus } from '../../challenge/challenge.entity'
 import { GameChatService } from '../../game-chat/game-chat.service'
-import { createChallenge } from './team-challenge.test-data'
+import { TeamChallengeTestData } from './team-challenge.test-data'
+import { TypeOrmModule } from '@nestjs/typeorm'
 
 describe('TeamChallengeController (e2e)', () => {
   let app: INestApplication
   let gameChatService
 
+  let teamChallengeTestData: TeamChallengeTestData
+
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [AppModule, TypeOrmModule.forFeature([Challenge])],
+      providers: [TeamChallengeTestData],
     }).compile()
 
     app = moduleFixture.createNestApplication()
     await app.init()
 
     gameChatService = app.get<GameChatService>(GameChatService)
+
+    teamChallengeTestData = app.get<TeamChallengeTestData>(
+      TeamChallengeTestData,
+    )
 
     jest.spyOn(gameChatService, 'create').mockResolvedValue(null)
   })
@@ -45,15 +53,12 @@ describe('TeamChallengeController (e2e)', () => {
   })
 
   it('/teams/:teamId/challenges (PUT)', async () => {
-    await createChallenge(
-      {
-        challengeId: 4,
-        challengerTeamId: 1,
-        challengedTeamId: 2,
-        status: ChallengeStatus.PENDING,
-      },
-      app,
-    )
+    await teamChallengeTestData.createChallenge({
+      challengeId: 4,
+      challengerTeamId: 1,
+      challengedTeamId: 2,
+      status: ChallengeStatus.PENDING,
+    })
 
     const challengeDto: UpdateChallengeDto = {
       challengeId: 4,
@@ -73,38 +78,29 @@ describe('TeamChallengeController (e2e)', () => {
 
   describe('/teams/:teamId/challenges (GET)', () => {
     beforeAll(async () => {
-      await createChallenge(
-        {
-          challengeId: 1,
-          challengerTeamId: 1,
-          challengedTeamId: 2,
-          message: `Are you up for a game?`,
-          status: ChallengeStatus.PENDING,
-        },
-        app,
-      )
+      await teamChallengeTestData.createChallenge({
+        challengeId: 1,
+        challengerTeamId: 1,
+        challengedTeamId: 2,
+        message: `Are you up for a game?`,
+        status: ChallengeStatus.PENDING,
+      })
 
-      await createChallenge(
-        {
-          challengeId: 2,
-          challengerTeamId: 1,
-          challengedTeamId: 2,
-          message: `Are you up for a game?`,
-          status: ChallengeStatus.REJECTED,
-        },
-        app,
-      )
+      await teamChallengeTestData.createChallenge({
+        challengeId: 2,
+        challengerTeamId: 1,
+        challengedTeamId: 2,
+        message: `Are you up for a game?`,
+        status: ChallengeStatus.REJECTED,
+      })
 
-      await createChallenge(
-        {
-          challengeId: 3,
-          challengerTeamId: 2,
-          challengedTeamId: 1,
-          message: `Are you up for a game?`,
-          status: ChallengeStatus.PENDING,
-        },
-        app,
-      )
+      await teamChallengeTestData.createChallenge({
+        challengeId: 3,
+        challengerTeamId: 2,
+        challengedTeamId: 1,
+        message: `Are you up for a game?`,
+        status: ChallengeStatus.PENDING,
+      })
     })
 
     it('/teams/:teamId/challenges?challenger=true (GET)', async () => {

@@ -2,47 +2,63 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { INestApplication } from '@nestjs/common'
 import { AppModule } from '../app.module'
 import { GameChatService } from './game-chat.service'
-import { createPlayer } from '../player/player.test-data'
-import { createTeam } from '../team/team.test-data'
-import { createChallenge } from '../team/team-challenge/team-challenge.test-data'
-import { ChallengeStatus } from '../challenge/challenge.entity'
+import { Challenge, ChallengeStatus } from '../challenge/challenge.entity'
+import { TeamTestData } from '../team/team.test-data'
+import { TeamModule } from '../team/team.module'
+import { PlayerTestData } from '../player/player.test-data'
+import { PlayerModule } from '../player/player.module'
+import { TeamChallengeTestData } from '../team/team-challenge/team-challenge.test-data'
+import { TypeOrmModule } from '@nestjs/typeorm'
 
 describe('GameChatService (e2e)', () => {
   let app: INestApplication
   let gameChatService: GameChatService
 
+  let teamTestData: TeamTestData
+  let playerTestData: PlayerTestData
+  let teamChallengeTestData: TeamChallengeTestData
+
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [
+        AppModule,
+        TeamModule,
+        PlayerModule,
+        TypeOrmModule.forFeature([Challenge]),
+      ],
+      providers: [TeamTestData, PlayerTestData, TeamChallengeTestData],
     }).compile()
 
     app = moduleFixture.createNestApplication()
     await app.init()
 
     gameChatService = app.get<GameChatService>(GameChatService)
+
+    teamTestData = app.get<TeamTestData>(TeamTestData)
+    playerTestData = app.get<PlayerTestData>(PlayerTestData)
+    teamChallengeTestData = app.get<TeamChallengeTestData>(
+      TeamChallengeTestData,
+    )
   })
 
   it('create', async () => {
-    const arnold = await createPlayer({ name: 'Arnold' }, app)
-    const gerald = await createPlayer({ name: 'Gerald' }, app)
+    const arnold = await playerTestData.createPlayer({ name: 'Arnold' })
+    const gerald = await playerTestData.createPlayer({ name: 'Gerald' })
 
-    const teamAarnold = await createTeam(
-      { name: 'Team Arnold', creatorId: arnold.playerId },
-      app,
-    )
-    const teamGerald = await createTeam(
-      { name: 'Team Gerald', creatorId: gerald.playerId },
-      app,
-    )
+    const teamAarnold = await teamTestData.createTeam({
+      name: 'Team Arnold',
+      creatorId: arnold.playerId,
+    })
+    const teamGerald = await teamTestData.createTeam({
+      name: 'Team Gerald',
+      creatorId: gerald.playerId,
+    })
 
-    const challenge = await createChallenge(
-      {
-        challengerTeamId: teamAarnold.teamId,
-        challengedTeamId: teamGerald.teamId,
-        status: ChallengeStatus.ACCEPTED,
-      },
-      app,
-    )
+    const challenge = await teamChallengeTestData.createChallenge({
+      challengerTeamId: teamAarnold.teamId,
+      challengedTeamId: teamGerald.teamId,
+      status: ChallengeStatus.ACCEPTED,
+    })
 
     const gameChat = await gameChatService.create(challenge)
 

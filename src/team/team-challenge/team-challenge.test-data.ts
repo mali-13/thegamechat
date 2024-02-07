@@ -1,26 +1,27 @@
-import { INestApplication } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { Repository } from 'typeorm'
 import { Challenge, ChallengeStatus } from '../../challenge/challenge.entity'
-import { getRepositoryToken } from '@nestjs/typeorm'
+import { InjectRepository } from '@nestjs/typeorm'
 
-const defaultChallenge: Partial<Challenge> = {
-  challengerTeamId: 1,
-  challengedTeamId: 2,
-  message: `Are you up for a game?`,
-  status: ChallengeStatus.PENDING,
-  madeOn: new Date(),
-}
+@Injectable()
+export class TeamChallengeTestData {
+  defaultChallenge: Partial<Challenge> = {
+    challengerTeamId: 1,
+    challengedTeamId: 2,
+    message: `Are you up for a game?`,
+    status: ChallengeStatus.PENDING,
+    madeOn: new Date(),
+  }
 
-export function createChallenge(
-  challenge: Partial<Challenge>,
-  app: INestApplication,
-) {
-  const challengeRepository = app.get<Repository<Challenge>>(
-    getRepositoryToken(Challenge),
-  )
+  constructor(
+    @InjectRepository(Challenge)
+    private readonly challengeRepository: Repository<Challenge>,
+  ) {}
 
-  return challengeRepository.save({
-    ...defaultChallenge,
-    ...challenge,
-  })
+  createChallenge(challenge: Partial<Challenge>) {
+    return this.challengeRepository.save({
+      ...this.defaultChallenge,
+      ...challenge,
+    })
+  }
 }
