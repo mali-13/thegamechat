@@ -4,6 +4,7 @@ import { GameChatService } from '../game-chat/game-chat.service'
 import { Mattermost } from '../mattermost/mattermost.service'
 import { In } from 'typeorm'
 import * as _ from 'lodash'
+import { TeamChannelSyncStatusBuilder } from './team-channel-sync.status'
 
 @Injectable()
 export class TeamChannelSync {
@@ -143,14 +144,26 @@ export class TeamChannelSync {
     const newMemberIds = _.difference(teamPlayersIds, memberIds)
     const oldMemberIds = _.difference(memberIds, teamPlayersIds)
 
-    const addToChannelPromises = newMemberIds.map((newMemberId) =>
-      this.mattermost.addToChannel(newMemberId, team.channelId),
+    const addStatuses = await Promise.all(
+      newMemberIds.map((newMemberId) =>
+        this.mattermost.addToChannel(newMemberId, team.channelId),
+      ),
     )
 
-    const removeFromChannelPromises = oldMemberIds.map((oldMemberId) =>
-      this.mattermost.removeFromChannel(oldMemberId, team.channelId),
+    const removeStatuses = await Promise.all(
+      oldMemberIds.map((oldMemberId) =>
+        this.mattermost.removeFromChannel(oldMemberId, team.channelId),
+      ),
     )
+    const teamChannelSyncStatus = new TeamChannelSyncStatusBuilder(
+      addStatuses,
+      removeStatuses,
+      channelMemberships,
+      newMemberIds,
+      oldMemberIds,
+      team,
+    ).build()
 
-    await Promise.all([...addToChannelPromises, removeFromChannelPromises])
+    return teamChannelSyncStatus
   }
 }

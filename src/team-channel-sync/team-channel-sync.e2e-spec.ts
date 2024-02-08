@@ -46,6 +46,35 @@ describe('TeamChannelSync (e2e)', () => {
 
   it('syncTeam', async () => {
     const arnold = await playerTestData.createPlayer({ name: 'Arnold' })
+
+    const teamArnold = await teamTestData.createTeam({
+      name: 'Team Arnold',
+      creatorId: arnold.playerId,
+    })
+
+    const teamChannelSyncStatus = await teamChannelSync.syncTeamChannel(
+      teamArnold.teamId,
+    )
+
+    expect(teamChannelSyncStatus).toMatchObject({
+      synced: expect.any(Date),
+      teamId: teamArnold.teamId,
+      added: [
+        {
+          playerId: arnold.playerId,
+          mattermostUserId: arnold.mattermostUserId,
+          channelMembership: arnold.mattermostUserId,
+        },
+      ],
+    })
+
+    expect(teamChannelSyncStatus.added.length).toBe(1)
+    // The sync removes the channel creator which is the admin user
+    expect(teamChannelSyncStatus.removed.length).toBe(1)
+  })
+
+  it('syncGame', async () => {
+    const arnold = await playerTestData.createPlayer({ name: 'Arnold' })
     const gerald = await playerTestData.createPlayer({ name: 'Gerald' })
 
     const teamAarnold = await teamTestData.createTeam({
