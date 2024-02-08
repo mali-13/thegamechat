@@ -1,4 +1,4 @@
-import { Team } from '../team/team.entity'
+import { Team } from '../../team/team.entity'
 import { StatusOK } from '@mattermost/types/client4'
 
 export class TeamChannelSyncStatusBuilder {
@@ -65,27 +65,27 @@ export class TeamChannelSyncStatusBuilder {
   }
 }
 
-type ChannelMembership = {
+export type ChannelMembership = {
   user_id: string
 }
 
-type TeamPlayer = {
+export type TeamPlayer = {
   playerId: number
   mattermostUserId: string
 }
 
-type AddedMember = {
+export type AddedMember = {
   playerId: number
   mattermostUserId: string
   channelMembership: string
 }
 
-type RemovedMember = {
+export type RemovedMember = {
   mattermostUserId: string
   removeStatus: string
 }
 
-type TeamChannelSyncStatus = {
+export type TeamChannelSyncStatus = {
   teamId: number
   teamName: string
   teamChannelId: string

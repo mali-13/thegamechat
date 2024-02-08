@@ -4,7 +4,12 @@ import { GameChatService } from '../game-chat/game-chat.service'
 import { Mattermost } from '../mattermost/mattermost.service'
 import { In } from 'typeorm'
 import * as _ from 'lodash'
-import { TeamChannelSyncStatusBuilder } from './team-channel-sync.status'
+import { TeamChannelSyncStatusBuilder } from './types/team-channel-sync-status'
+import {
+  GameChatSyncStatusBuilder,
+  TeamGameChatSyncStatusBuilder,
+} from './types/team-game-chat-sync-status'
+import { SyncStatusBuilder } from './types/sync-status'
 
 @Injectable()
 export class TeamChannelSync {
@@ -15,8 +20,23 @@ export class TeamChannelSync {
   ) {}
 
   async sync(teamId: number) {
-    await this.syncTeamChannel(teamId)
-    await this.syncGameChats(teamId)
+    const team = await this.teamService.findOne({
+      where: { teamId },
+      relations: {
+        players: true,
+      },
+    })
+
+    const teamChannelSyncStatus = await this.syncTeamChannel(teamId)
+    const teamGameChatSyncStatus = await this.syncGameChats(teamId)
+
+    const syncStatus = new SyncStatusBuilder(
+      teamChannelSyncStatus,
+      teamGameChatSyncStatus,
+      team,
+    ).build()
+
+    return syncStatus
   }
 
   async syncGameChats(teamId: number) {
@@ -38,6 +58,8 @@ export class TeamChannelSync {
         players: true,
       },
     })
+
+    const team = teams.find((team) => team.teamId === teamId)
 
     const gameChatChannelIds = gameChats.map((gameChat) => gameChat.channelId)
 
@@ -105,22 +127,53 @@ export class TeamChannelSync {
       new Map<string, string[]>(),
     )
 
-    await Promise.all(
-      gameChats.map((gameChat) => {
+    const gameChatSyncStatuses = await Promise.all(
+      gameChats.map(async (gameChat) => {
+        const challengerTeam = teams.find(
+          (team) => team.teamId === gameChat.challengerTeamId,
+        )
+        const challengedTeam = teams.find(
+          (team) => team.teamId === gameChat.challengedTeamId,
+        )
+
+        const chanelMembershipUserIds = channelIdToMemberIds.get(
+          gameChat.channelId,
+        )
+
         const newMemberIds = channelIdToNewMemberIds.get(gameChat.channelId)
         const oldMemberIds = channelIdToOldMemberIds.get(gameChat.channelId)
 
-        const addToChannelPromises = newMemberIds.map((newMemberId) =>
-          this.mattermost.addToChannel(newMemberId, gameChat.channelId),
+        const addStatuses = await Promise.all(
+          newMemberIds.map((newMemberId) =>
+            this.mattermost.addToChannel(newMemberId, gameChat.channelId),
+          ),
         )
 
-        const removeFromChannelPromises = oldMemberIds.map((oldMemberId) =>
-          this.mattermost.removeFromChannel(oldMemberId, gameChat.channelId),
+        const removeStatuses = await Promise.all(
+          oldMemberIds.map((oldMemberId) =>
+            this.mattermost.removeFromChannel(oldMemberId, gameChat.channelId),
+          ),
         )
 
-        return [...addToChannelPromises, removeFromChannelPromises]
+        return new GameChatSyncStatusBuilder(
+          addStatuses,
+          removeStatuses,
+          chanelMembershipUserIds,
+          newMemberIds,
+          oldMemberIds,
+          gameChat,
+          challengerTeam,
+          challengedTeam,
+        ).build()
       }),
     )
+
+    const teamGameChatSyncStatuses = new TeamGameChatSyncStatusBuilder(
+      team,
+      gameChatSyncStatuses,
+    ).build()
+
+    return teamGameChatSyncStatuses
   }
 
   async syncTeamChannel(teamId: number) {

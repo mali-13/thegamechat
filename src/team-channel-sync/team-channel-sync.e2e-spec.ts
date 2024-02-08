@@ -44,7 +44,8 @@ describe('TeamChannelSync (e2e)', () => {
     teamChannelSync = app.get<TeamChannelSync>(TeamChannelSync)
   })
 
-  it('syncTeam', async () => {
+  /** When a team and team channel is create, the creator needs to be added to the channel */
+  it('syncs new new team with team channel', async () => {
     const arnold = await playerTestData.createPlayer({ name: 'Arnold' })
 
     const teamArnold = await teamTestData.createTeam({
@@ -56,6 +57,7 @@ describe('TeamChannelSync (e2e)', () => {
       teamArnold.teamId,
     )
 
+    // expect team creator to be added to the team channel
     expect(teamChannelSyncStatus).toMatchObject({
       synced: expect.any(Date),
       teamId: teamArnold.teamId,
@@ -73,7 +75,7 @@ describe('TeamChannelSync (e2e)', () => {
     expect(teamChannelSyncStatus.removed.length).toBe(1)
   })
 
-  it('syncGame', async () => {
+  it('syncs new game chat with challenger and challenged teams', async () => {
     const arnold = await playerTestData.createPlayer({ name: 'Arnold' })
     const gerald = await playerTestData.createPlayer({ name: 'Gerald' })
 
@@ -94,6 +96,44 @@ describe('TeamChannelSync (e2e)', () => {
 
     const gameChat = await gameChatService.create(challenge)
 
-    await teamChannelSync.syncGameChats(teamAarnold.teamId)
+    const teamGameChatSyncStatus = await teamChannelSync.syncGameChats(
+      teamAarnold.teamId,
+    )
+
+    expect(teamGameChatSyncStatus).toMatchObject({
+      synced: expect.any(Date),
+      teamId: teamAarnold.teamId,
+      teamName: teamAarnold.name,
+      teamPlayers: [
+        {
+          playerId: arnold.playerId,
+          mattermostUserId: arnold.mattermostUserId,
+        },
+      ],
+    })
+
+    const gameChatSyncStatuses = teamGameChatSyncStatus.gameChatSyncStatuses
+
+    const gameChatSyncStatus = gameChatSyncStatuses.find(
+      (s) => s.gameChatId === gameChat.gameChatId,
+    )
+
+    expect(gameChatSyncStatus).toMatchObject({
+      synced: expect.any(Date),
+      gameChatId: gameChat.gameChatId,
+      channelId: gameChat.channelId,
+      added: [
+        {
+          playerId: arnold.playerId,
+          mattermostUserId: arnold.mattermostUserId,
+          channelMembership: arnold.mattermostUserId,
+        },
+        {
+          playerId: gerald.playerId,
+          mattermostUserId: gerald.mattermostUserId,
+          channelMembership: gerald.mattermostUserId,
+        },
+      ],
+    })
   })
 })
