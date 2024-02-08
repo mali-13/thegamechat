@@ -10,10 +10,12 @@ import { TeamChallengeTestData } from '../team/team-challenge/team-challenge.tes
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { GameChatService } from '../game-chat/game-chat.service'
 import { TeamChannelSync } from './team-channel-sync'
+import { TeamPlayerService } from '../team/team-player/team-player.service'
 
 describe('TeamChannelSync (e2e)', () => {
   let app: INestApplication
   let gameChatService: GameChatService
+  let teamPlayerService: TeamPlayerService
   let teamChannelSync: TeamChannelSync
 
   let teamTestData: TeamTestData
@@ -42,10 +44,11 @@ describe('TeamChannelSync (e2e)', () => {
       TeamChallengeTestData,
     )
     teamChannelSync = app.get<TeamChannelSync>(TeamChannelSync)
+    teamPlayerService = app.get<TeamPlayerService>(TeamPlayerService)
   })
 
   /** When a team and team channel is create, the creator needs to be added to the channel */
-  it('syncs new new team with team channel', async () => {
+  it('syncs team with team channel (add player)', async () => {
     const arnold = await playerTestData.createPlayer({ name: 'Arnold' })
 
     const teamArnold = await teamTestData.createTeam({
@@ -75,7 +78,51 @@ describe('TeamChannelSync (e2e)', () => {
     expect(teamChannelSyncStatus.removed.length).toBe(1)
   })
 
-  it('syncs new game chat with challenger and challenged teams', async () => {
+  it('syncs team with team channel (remove player)', async () => {
+    const arnold = await playerTestData.createPlayer({ name: 'Arnold' })
+
+    const teamArnold = await teamTestData.createTeam({
+      name: 'Team Arnold',
+      creatorId: arnold.playerId,
+    })
+
+    const firstTeamChannelSyncStatus = await teamChannelSync.syncTeamChannel(
+      teamArnold.teamId,
+    )
+
+    // expect team creator to be added to the team channel
+    expect(firstTeamChannelSyncStatus).toMatchObject({
+      synced: expect.any(Date),
+      teamId: teamArnold.teamId,
+      added: [
+        {
+          playerId: arnold.playerId,
+          mattermostUserId: arnold.mattermostUserId,
+          channelMembership: arnold.mattermostUserId,
+        },
+      ],
+    })
+
+    // remove arnold from team
+    await teamPlayerService.removePlayer(teamArnold.teamId, arnold.playerId)
+
+    const secondTeamChannelSyncStatus = await teamChannelSync.syncTeamChannel(
+      teamArnold.teamId,
+    )
+
+    expect(secondTeamChannelSyncStatus).toMatchObject({
+      synced: expect.any(Date),
+      teamId: teamArnold.teamId,
+      removed: [
+        {
+          mattermostUserId: arnold.mattermostUserId,
+          removeStatus: 'OK',
+        },
+      ],
+    })
+  })
+
+  it('syncs game chat with challenger and challenged teams(add player)', async () => {
     const arnold = await playerTestData.createPlayer({ name: 'Arnold' })
     const gerald = await playerTestData.createPlayer({ name: 'Gerald' })
 
@@ -132,6 +179,89 @@ describe('TeamChannelSync (e2e)', () => {
           playerId: gerald.playerId,
           mattermostUserId: gerald.mattermostUserId,
           channelMembership: gerald.mattermostUserId,
+        },
+      ],
+    })
+  })
+
+  it('syncs game chat with challenger and challenged teams(remove player)', async () => {
+    const arnold = await playerTestData.createPlayer({ name: 'Arnold' })
+    const gerald = await playerTestData.createPlayer({ name: 'Gerald' })
+
+    const teamArnold = await teamTestData.createTeam({
+      name: 'Team Arnold',
+      creatorId: arnold.playerId,
+    })
+    const teamGerald = await teamTestData.createTeam({
+      name: 'Team Gerald',
+      creatorId: gerald.playerId,
+    })
+
+    const challenge = await teamChallengeTestData.createChallenge({
+      challengerTeamId: teamArnold.teamId,
+      challengedTeamId: teamGerald.teamId,
+      status: ChallengeStatus.ACCEPTED,
+    })
+
+    const gameChat = await gameChatService.create(challenge)
+
+    const firstTeamGameChatSyncStatus = await teamChannelSync.syncGameChats(
+      teamArnold.teamId,
+    )
+
+    expect(firstTeamGameChatSyncStatus).toMatchObject({
+      synced: expect.any(Date),
+      teamId: teamArnold.teamId,
+      teamName: teamArnold.name,
+      teamPlayers: [
+        {
+          playerId: arnold.playerId,
+          mattermostUserId: arnold.mattermostUserId,
+        },
+      ],
+      gameChatSyncStatuses: [
+        {
+          synced: expect.any(Date),
+          gameChatId: gameChat.gameChatId,
+          channelId: gameChat.channelId,
+          added: [
+            {
+              playerId: arnold.playerId,
+              mattermostUserId: arnold.mattermostUserId,
+              channelMembership: arnold.mattermostUserId,
+            },
+            {
+              playerId: gerald.playerId,
+              mattermostUserId: gerald.mattermostUserId,
+              channelMembership: gerald.mattermostUserId,
+            },
+          ],
+        },
+      ],
+    })
+
+    await teamPlayerService.removePlayer(teamArnold.teamId, arnold.playerId)
+
+    const secondTeamGameChatSyncStatus = await teamChannelSync.syncGameChats(
+      teamArnold.teamId,
+    )
+
+    expect(secondTeamGameChatSyncStatus).toMatchObject({
+      synced: expect.any(Date),
+      teamId: teamArnold.teamId,
+      teamName: teamArnold.name,
+      teamPlayers: [],
+      gameChatSyncStatuses: [
+        {
+          synced: expect.any(Date),
+          gameChatId: gameChat.gameChatId,
+          channelId: gameChat.channelId,
+          removed: [
+            {
+              mattermostUserId: arnold.mattermostUserId,
+              removeStatus: 'OK',
+            },
+          ],
         },
       ],
     })
