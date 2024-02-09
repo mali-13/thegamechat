@@ -7,6 +7,7 @@ import { TeamPlayerEditHandlerController } from './team-player-edit-handler.cont
 @Module({
   providers: [TeamPlayerEditHandler],
   imports: [TeamModule, TeamChannelSyncModule],
+  exports: [TeamPlayerEditHandler],
   controllers: [TeamPlayerEditHandlerController],
 })
 export class TeamPlayerEditHandlerModule {}

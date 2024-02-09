@@ -10,7 +10,11 @@ export class TeamPlayerEditHandler {
     private readonly teamChannelSync: TeamChannelSync,
   ) {}
 
-  async addPlayer(teamId: number, player: UpdatePlayerDto, inviteCode: string) {
+  async addPlayer(
+    teamId: number,
+    player: UpdatePlayerDto,
+    inviteCode?: string,
+  ) {
     const addedPlayer = await this.teamPlayerService.addPlayer(
       teamId,
       player,

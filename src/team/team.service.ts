@@ -11,7 +11,7 @@ export class TeamService {
     private readonly teamRepository: Repository<Team>,
   ) {}
 
-  async save(teamDto: TeamDto) {
+  async saveDto(teamDto: TeamDto) {
     const team = await this.teamRepository.findOneBy({ teamId: teamDto.teamId })
 
     if (!team) {
@@ -26,7 +26,11 @@ export class TeamService {
     return this.teamRepository.save(team)
   }
 
-  find(options: FindManyOptions<Team>) {
+  async save(team: Team) {
+    return this.teamRepository.save(team)
+  }
+
+  async find(options: FindManyOptions<Team>) {
     return this.teamRepository.find(options)
   }
 

@@ -1,18 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { INestApplication } from '@nestjs/common'
-import { AppModule } from '../app.module'
-import { GameChatService } from './game-chat.service'
-import { Challenge, ChallengeStatus } from '../challenge/challenge.entity'
-import { TeamTestData } from '../team/team.test-data'
-import { TeamModule } from '../team/team.module'
-import { PlayerTestData } from '../player/player.test-data'
-import { PlayerModule } from '../player/player.module'
-import { TeamChallengeTestData } from '../team/team-challenge/team-challenge.test-data'
+import { AppModule } from '../../app.module'
+import { Challenge, ChallengeStatus } from '../../challenge/challenge.entity'
+import { TeamTestData } from '../../team/team.test-data'
+import { TeamModule } from '../../team/team.module'
+import { PlayerTestData } from '../../player/player.test-data'
+import { PlayerModule } from '../../player/player.module'
+import { TeamChallengeTestData } from '../../team/team-challenge/team-challenge.test-data'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { GameChatCreatorService } from './game-chat-creator.service'
+import { TeamCreatorModule } from '../../team/team-creator/team-creator.module'
 
-describe('GameChatService (e2e)', () => {
+describe('GameChatCreatorService (e2e)', () => {
   let app: INestApplication
-  let gameChatService: GameChatService
+  let gameChatCreatorService: GameChatCreatorService
 
   let teamTestData: TeamTestData
   let playerTestData: PlayerTestData
@@ -23,6 +24,7 @@ describe('GameChatService (e2e)', () => {
       imports: [
         AppModule,
         TeamModule,
+        TeamCreatorModule,
         PlayerModule,
         TypeOrmModule.forFeature([Challenge]),
       ],
@@ -32,7 +34,9 @@ describe('GameChatService (e2e)', () => {
     app = moduleFixture.createNestApplication()
     await app.init()
 
-    gameChatService = app.get<GameChatService>(GameChatService)
+    gameChatCreatorService = app.get<GameChatCreatorService>(
+      GameChatCreatorService,
+    )
 
     teamTestData = app.get<TeamTestData>(TeamTestData)
     playerTestData = app.get<PlayerTestData>(PlayerTestData)
@@ -60,7 +64,7 @@ describe('GameChatService (e2e)', () => {
       status: ChallengeStatus.ACCEPTED,
     })
 
-    const gameChat = await gameChatService.create(challenge)
+    const gameChat = await gameChatCreatorService.create(challenge)
 
     expect(gameChat.challengerTeamId).toBe(teamAarnold.teamId)
     expect(gameChat.challengedTeamId).toBe(teamGerald.teamId)

@@ -3,13 +3,13 @@ import { ChallengeService } from '../../challenge/challenge.service'
 import { ChallengeDto, UpdateChallengeDto } from '../../challenge/challenge.dto'
 import { ChallengeFindOptionDto } from './team-challenge.dto'
 import { ChallengeStatus } from '../../challenge/challenge.entity'
-import { GameChatService } from '../../game-chat/game-chat.service'
+import { GameChatCreatorService } from '../../game-chat/game-chat-creator/game-chat-creator.service'
 
 @Injectable()
 export class TeamChallengeService {
   constructor(
     private readonly challengeService: ChallengeService,
-    private readonly gameChatService: GameChatService,
+    private readonly gameChatCreatorService: GameChatCreatorService,
   ) {}
 
   create(challengeDto: ChallengeDto) {
@@ -52,7 +52,7 @@ export class TeamChallengeService {
       challengeDto.status === ChallengeStatus.ACCEPTED
 
     if (challengeAccepted) {
-      await this.gameChatService.create(challenge)
+      await this.gameChatCreatorService.create(challenge)
     }
 
     if (!!challengeDto.status) {

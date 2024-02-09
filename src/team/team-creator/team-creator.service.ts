@@ -2,18 +2,16 @@ import { TeamDto } from '../team.dto'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { Team } from '../team.entity'
 import { uuid } from 'short-uuid'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
 import { PlayerService } from '../../player/player.service'
 import { Mattermost } from '../../mattermost/mattermost.service'
-import { TeamPlayerService } from '../team-player/team-player.service'
+import { TeamPlayerEditHandler } from '../team-player/team-player-edit-handler/team-player-edit-handler'
+import { TeamService } from '../team.service'
 
 @Injectable()
 export class TeamCreatorService {
   constructor(
-    @InjectRepository(Team)
-    private readonly teamRepository: Repository<Team>,
-    private readonly teamPlayerService: TeamPlayerService,
+    private readonly teamService: TeamService,
+    private readonly teamPlayerEditHandler: TeamPlayerEditHandler,
     private readonly playerService: PlayerService,
     private readonly mattermost: Mattermost,
   ) {}
@@ -47,9 +45,9 @@ export class TeamCreatorService {
 
     team.channelId = teamChannel.id
 
-    const newTeam = await this.teamRepository.save(team)
+    const newTeam = await this.teamService.save(team)
 
-    await this.teamPlayerService.addPlayer(newTeam.teamId, {
+    await this.teamPlayerEditHandler.addPlayer(newTeam.teamId, {
       playerId: creator.playerId,
     })
 
