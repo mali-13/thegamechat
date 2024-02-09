@@ -11,6 +11,7 @@ import { TeamChallengeModule } from './team/team-challenge/team-challenge.module
 import { APP_PIPE } from '@nestjs/core'
 import { GameChatModule } from './game-chat/game-chat.module'
 import { TeamChannelSyncModule } from './team-channel-sync/team-channel-sync.module'
+import { TeamPlayerEditHandlerModule } from './team/team-player/team-player-edit-handler/team-player-edit-handler.module'
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { TeamChannelSyncModule } from './team-channel-sync/team-channel-sync.mod
     ChallengeModule,
     GameChatModule,
     TeamChannelSyncModule,
+    TeamPlayerEditHandlerModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',

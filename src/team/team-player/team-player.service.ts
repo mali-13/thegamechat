@@ -8,7 +8,6 @@ import { In, Repository } from 'typeorm'
 import { Team } from '../team.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { PlayerService } from '../../player/player.service'
-import { TeamChannelSync } from '../../team-channel-sync/team-channel-sync'
 
 @Injectable()
 export class TeamPlayerService {
@@ -16,7 +15,6 @@ export class TeamPlayerService {
     @InjectRepository(Team)
     private readonly teamRepository: Repository<Team>,
     private readonly playerService: PlayerService,
-    private readonly teamChannelSync: TeamChannelSync,
   ) {}
 
   async findPlayers(teamId: number) {
@@ -90,8 +88,6 @@ export class TeamPlayerService {
       .of(team)
       .remove(player)
 
-    await this.teamChannelSync.sync(teamId)
-
     return player
   }
 
@@ -142,8 +138,6 @@ export class TeamPlayerService {
     team.players.push(player)
 
     await this.teamRepository.save(team)
-
-    await this.teamChannelSync.sync(teamId)
 
     return player
   }

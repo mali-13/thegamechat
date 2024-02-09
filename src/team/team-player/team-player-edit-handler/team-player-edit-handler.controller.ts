@@ -7,19 +7,19 @@ import {
   Put,
   Query,
 } from '@nestjs/common'
-import { TeamPlayerService } from './team-player.service'
-import { UpdatePlayerDto } from '../../player/player.dto'
+import { UpdatePlayerDto } from '../../../player/player.dto'
+import { TeamPlayerEditHandler } from './team-player-edit-handler'
 
 @Controller('teams/:teamId/players')
-export class TeamPlayerController {
-  constructor(readonly teamPlayerService: TeamPlayerService) {}
+export class TeamPlayerEditHandlerController {
+  constructor(private readonly teamPlayerEditHandler: TeamPlayerEditHandler) {}
 
   @Put('/')
   async updatePlayers(
     @Param('teamId') teamId: number,
     @Body() players: UpdatePlayerDto[],
   ) {
-    return this.teamPlayerService.updatePlayers(teamId, players)
+    return this.teamPlayerEditHandler.updatePlayers(teamId, players)
   }
 
   @Post('/')
@@ -28,7 +28,7 @@ export class TeamPlayerController {
     @Query('inviteCode') inviteCode: string,
     @Body() player: UpdatePlayerDto,
   ) {
-    return this.teamPlayerService.addPlayer(teamId, player, inviteCode)
+    return this.teamPlayerEditHandler.addPlayer(teamId, player, inviteCode)
   }
 
   @Delete('/:playerId')
@@ -36,6 +36,6 @@ export class TeamPlayerController {
     @Param('teamId') teamId: number,
     @Param('playerId') playerId: number,
   ) {
-    return this.teamPlayerService.removePlayer(teamId, playerId)
+    return this.teamPlayerEditHandler.removePlayer(teamId, playerId)
   }
 }
