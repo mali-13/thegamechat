@@ -47,8 +47,6 @@ export class TeamCreatorService {
 
     team.channelId = teamChannel.id
 
-    await this.mattermost.addToChannel(creator.mattermostUserId, teamChannel.id)
-
     const newTeam = await this.teamRepository.save(team)
 
     await this.teamPlayerService.addPlayer(newTeam.teamId, {

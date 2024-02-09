@@ -40,9 +40,20 @@ export class TeamChannelSync {
   }
 
   async syncGameChats(teamId: number) {
+    const team = await this.teamService.findOne({
+      where: { teamId },
+      relations: {
+        players: true,
+      },
+    })
+
     const gameChats = await this.gameChatService.find({
       where: [{ challengerTeamId: teamId }, { challengedTeamId: teamId }],
     })
+
+    if (!gameChats.length) {
+      return new TeamGameChatSyncStatusBuilder(team).build()
+    }
 
     const teamIds = gameChats.reduce((teamIds, gameChat) => {
       teamIds.add(gameChat.challengerTeamId)
@@ -58,8 +69,6 @@ export class TeamChannelSync {
         players: true,
       },
     })
-
-    const team = teams.find((team) => team.teamId === teamId)
 
     const gameChatChannelIds = gameChats.map((gameChat) => gameChat.channelId)
 
@@ -168,10 +177,9 @@ export class TeamChannelSync {
       }),
     )
 
-    const teamGameChatSyncStatuses = new TeamGameChatSyncStatusBuilder(
-      team,
-      gameChatSyncStatuses,
-    ).build()
+    const teamGameChatSyncStatuses = new TeamGameChatSyncStatusBuilder(team)
+      .gameChatSyncStatuses(gameChatSyncStatuses)
+      .build()
 
     return teamGameChatSyncStatuses
   }

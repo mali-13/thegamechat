@@ -25,8 +25,8 @@ export class Challenge {
   @Column()
   challengedTeamId: number
 
-  @Column()
-  message: string
+  @Column({ nullable: true })
+  message?: string
 
   @CreateDateColumn()
   madeOn: Date

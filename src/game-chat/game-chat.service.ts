@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { Repository } from 'typeorm'
+import { FindManyOptions, Repository } from 'typeorm'
 import { GameChat } from './game-chat.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Mattermost } from '../mattermost/mattermost.service'
@@ -56,18 +56,10 @@ export class GameChatService {
 
     gameChat.channelId = channel.id
 
-    const allPlayers = [...challenger.players, ...challenged.players]
-
-    await Promise.all(
-      allPlayers.map(
-        async (player) =>
-          await this.mattermost.addToChannel(
-            player.mattermostUserId,
-            channel.id,
-          ),
-      ),
-    )
-
     return await this.gameChatRepository.save(gameChat)
+  }
+
+  async find(options: FindManyOptions<GameChat>) {
+    return this.gameChatRepository.find(options)
   }
 }

@@ -13,7 +13,12 @@ export class TeamController {
 
   @Get('/')
   find() {
-    return this.teamService.find()
+    return this.teamService.find({
+      relations: {
+        players: true,
+        creator: true,
+      },
+    })
   }
 
   @Get('/:teamId')

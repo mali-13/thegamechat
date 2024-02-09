@@ -108,7 +108,7 @@ export class GameChatSyncStatusBuilder {
 export class TeamGameChatSyncStatusBuilder {
   private readonly teamGameChatSyncStatus: TeamGameChatSyncStatus
 
-  constructor(team: Team, gameChatSyncStatuses: GameChatSyncStatus[]) {
+  constructor(team: Team) {
     const teamPlayers = team.players.map((player) => ({
       playerId: player.playerId,
       mattermostUserId: player.mattermostUserId,
@@ -120,9 +120,14 @@ export class TeamGameChatSyncStatusBuilder {
       teamId: team.teamId,
       teamName: team.name,
       teamPlayers,
-      gameChatSyncStatuses,
+      gameChatSyncStatuses: [],
       synced,
     }
+  }
+
+  gameChatSyncStatuses(gameChatSyncStatuses: GameChatSyncStatus[]) {
+    this.teamGameChatSyncStatus.gameChatSyncStatuses = gameChatSyncStatuses
+    return this
   }
 
   build(): TeamGameChatSyncStatus {

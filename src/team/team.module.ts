@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 import { TeamController } from './team.controller'
 import { TeamService } from './team.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
@@ -8,11 +8,16 @@ import { TeamCreatorService } from './team-creator/team-creator.service'
 import { TeamPlayerService } from './team-player/team-player.service'
 import { TeamPlayerController } from './team-player/team-player.controller'
 import { TeamCreatorController } from './team-creator/team-creator.controller'
+import { TeamChannelSyncModule } from '../team-channel-sync/team-channel-sync.module'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Team]), PlayerModule],
+  imports: [
+    TypeOrmModule.forFeature([Team]),
+    PlayerModule,
+    forwardRef(() => TeamChannelSyncModule),
+  ],
   controllers: [TeamController, TeamPlayerController, TeamCreatorController],
   providers: [TeamService, TeamCreatorService, TeamPlayerService],
-  exports: [TeamService],
+  exports: [TeamService, TeamCreatorService, TeamPlayerService],
 })
 export class TeamModule {}

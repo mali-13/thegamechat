@@ -122,7 +122,7 @@ describe('TeamChannelSync (e2e)', () => {
     })
   })
 
-  it('syncs game chat with challenger and challenged teams(add player)', async () => {
+  it('syncs game chat with challenger and challenged teams (add player)', async () => {
     const arnold = await playerTestData.createPlayer({ name: 'Arnold' })
     const gerald = await playerTestData.createPlayer({ name: 'Gerald' })
 
@@ -184,7 +184,7 @@ describe('TeamChannelSync (e2e)', () => {
     })
   })
 
-  it('syncs game chat with challenger and challenged teams(remove player)', async () => {
+  it('syncs game chat with challenger and challenged teams (remove player)', async () => {
     const arnold = await playerTestData.createPlayer({ name: 'Arnold' })
     const gerald = await playerTestData.createPlayer({ name: 'Gerald' })
 
