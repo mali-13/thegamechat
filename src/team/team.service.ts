@@ -31,7 +31,15 @@ export class TeamService {
   }
 
   async find(options: FindManyOptions<Team>) {
-    return this.teamRepository.find(options)
+    const teams = await this.teamRepository.find(options)
+
+    teams.forEach((team) => {
+      team.playerCount = team.players.length
+      //Rule: Team is considered established if it has at least 5 players
+      team.established = team.playerCount >= 5
+    })
+
+    return teams
   }
 
   async findOne(options: FindOneOptions<Team>): Promise<Team> {

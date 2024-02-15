@@ -22,8 +22,12 @@ export class Team {
   @Column()
   channelId: string
 
+  established: boolean
+
   @ManyToOne(() => Player, (player) => player.createdTeams)
   creator: Player
+
+  playerCount: number
 
   @ManyToMany(() => Player, (player) => player.teams)
   @JoinTable()
