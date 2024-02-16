@@ -40,6 +40,11 @@ describe('TeamController (e2e)', () => {
     await initTestData()
   })
 
+  afterEach(() => {
+    jest.clearAllMocks()
+    jest.restoreAllMocks()
+  })
+
   it('/teams (GET)', async () => {
     const { body: teams } = await request(app.getHttpServer())
       .get('/teams')

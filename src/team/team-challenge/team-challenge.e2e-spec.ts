@@ -4,13 +4,13 @@ import * as request from 'supertest'
 import { AppModule } from '../../app.module'
 import { ChallengeDto, UpdateChallengeDto } from '../../challenge/challenge.dto'
 import { Challenge, ChallengeStatus } from '../../challenge/challenge.entity'
-import { GameChatService } from '../../game-chat/game-chat.service'
 import { TeamChallengeTestData } from './team-challenge.test-data'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { GameChatCreatorService } from '../../game-chat/game-chat-creator/game-chat-creator.service'
 
 describe('TeamChallengeController (e2e)', () => {
   let app: INestApplication
-  let gameChatService
+  let gameChatCreatorService
 
   let teamChallengeTestData: TeamChallengeTestData
 
@@ -23,13 +23,15 @@ describe('TeamChallengeController (e2e)', () => {
     app = moduleFixture.createNestApplication()
     await app.init()
 
-    gameChatService = app.get<GameChatService>(GameChatService)
+    gameChatCreatorService = app.get<GameChatCreatorService>(
+      GameChatCreatorService,
+    )
 
     teamChallengeTestData = app.get<TeamChallengeTestData>(
       TeamChallengeTestData,
     )
 
-    jest.spyOn(gameChatService, 'create').mockResolvedValue(null)
+    jest.spyOn(gameChatCreatorService, 'create').mockResolvedValue(null)
   })
 
   it('/teams/:teamId/challenges (Post)', async () => {

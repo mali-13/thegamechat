@@ -8,14 +8,15 @@ import { PlayerTestData } from '../player/player.test-data'
 import { PlayerModule } from '../player/player.module'
 import { TeamChallengeTestData } from '../team/team-challenge/team-challenge.test-data'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { GameChatService } from '../game-chat/game-chat.service'
 import { TeamChannelSync } from './team-channel-sync'
-import { TeamPlayerService } from '../team/team-player/team-player.service'
+import { GameChatCreatorService } from '../game-chat/game-chat-creator/game-chat-creator.service'
+import { TeamCreatorModule } from '../team/team-creator/team-creator.module'
+import { TeamPlayerEditHandler } from '../team/team-player/team-player-edit-handler/team-player-edit-handler'
 
 describe('TeamChannelSync (e2e)', () => {
   let app: INestApplication
-  let gameChatService: GameChatService
-  let teamPlayerService: TeamPlayerService
+  let gameChatCreator: GameChatCreatorService
+  let teamPlayerEditHandler: TeamPlayerEditHandler
   let teamChannelSync: TeamChannelSync
 
   let teamTestData: TeamTestData
@@ -27,6 +28,7 @@ describe('TeamChannelSync (e2e)', () => {
       imports: [
         AppModule,
         TeamModule,
+        TeamCreatorModule,
         PlayerModule,
         TypeOrmModule.forFeature([Challenge]),
       ],
@@ -36,7 +38,7 @@ describe('TeamChannelSync (e2e)', () => {
     app = moduleFixture.createNestApplication()
     await app.init()
 
-    gameChatService = app.get<GameChatService>(GameChatService)
+    gameChatCreator = app.get<GameChatCreatorService>(GameChatCreatorService)
 
     teamTestData = app.get<TeamTestData>(TeamTestData)
     playerTestData = app.get<PlayerTestData>(PlayerTestData)
@@ -44,21 +46,29 @@ describe('TeamChannelSync (e2e)', () => {
       TeamChallengeTestData,
     )
     teamChannelSync = app.get<TeamChannelSync>(TeamChannelSync)
-    teamPlayerService = app.get<TeamPlayerService>(TeamPlayerService)
+    teamPlayerEditHandler = app.get<TeamPlayerEditHandler>(
+      TeamPlayerEditHandler,
+    )
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+    jest.restoreAllMocks()
   })
 
   /** When a team and team channel is create, the creator needs to be added to the channel */
   it('syncs team with team channel (add player)', async () => {
     const arnold = await playerTestData.createPlayer({ name: 'Arnold' })
 
+    const syncSpy = jest.spyOn(teamChannelSync, 'sync')
+
     const teamArnold = await teamTestData.createTeam({
       name: 'Team Arnold',
       creatorId: arnold.playerId,
     })
 
-    const teamChannelSyncStatus = await teamChannelSync.syncTeamChannel(
-      teamArnold.teamId,
-    )
+    const teamChannelSyncStatus = (await syncSpy.mock.results[0].value)
+      .teamChannelSyncStatus
 
     // expect team creator to be added to the team channel
     expect(teamChannelSyncStatus).toMatchObject({
@@ -81,14 +91,15 @@ describe('TeamChannelSync (e2e)', () => {
   it('syncs team with team channel (remove player)', async () => {
     const arnold = await playerTestData.createPlayer({ name: 'Arnold' })
 
+    const syncSpy = jest.spyOn(teamChannelSync, 'sync')
+
     const teamArnold = await teamTestData.createTeam({
       name: 'Team Arnold',
       creatorId: arnold.playerId,
     })
 
-    const firstTeamChannelSyncStatus = await teamChannelSync.syncTeamChannel(
-      teamArnold.teamId,
-    )
+    const firstTeamChannelSyncStatus = (await syncSpy.mock.results[0].value)
+      .teamChannelSyncStatus
 
     // expect team creator to be added to the team channel
     expect(firstTeamChannelSyncStatus).toMatchObject({
@@ -104,11 +115,10 @@ describe('TeamChannelSync (e2e)', () => {
     })
 
     // remove arnold from team
-    await teamPlayerService.removePlayer(teamArnold.teamId, arnold.playerId)
+    await teamPlayerEditHandler.removePlayer(teamArnold.teamId, arnold.playerId)
 
-    const secondTeamChannelSyncStatus = await teamChannelSync.syncTeamChannel(
-      teamArnold.teamId,
-    )
+    const secondTeamChannelSyncStatus = (await syncSpy.mock.results[1].value)
+      .teamChannelSyncStatus
 
     expect(secondTeamChannelSyncStatus).toMatchObject({
       synced: expect.any(Date),
@@ -141,11 +151,11 @@ describe('TeamChannelSync (e2e)', () => {
       status: ChallengeStatus.ACCEPTED,
     })
 
-    const gameChat = await gameChatService.create(challenge)
+    const syncSpy = jest.spyOn(teamChannelSync, 'syncGameChats')
 
-    const teamGameChatSyncStatus = await teamChannelSync.syncGameChats(
-      teamAarnold.teamId,
-    )
+    const gameChat = await gameChatCreator.create(challenge)
+
+    const teamGameChatSyncStatus = await syncSpy.mock.results[0].value
 
     expect(teamGameChatSyncStatus).toMatchObject({
       synced: expect.any(Date),
@@ -203,11 +213,12 @@ describe('TeamChannelSync (e2e)', () => {
       status: ChallengeStatus.ACCEPTED,
     })
 
-    const gameChat = await gameChatService.create(challenge)
+    const syncGameChatsSpy = jest.spyOn(teamChannelSync, 'syncGameChats')
 
-    const firstTeamGameChatSyncStatus = await teamChannelSync.syncGameChats(
-      teamArnold.teamId,
-    )
+    const gameChat = await gameChatCreator.create(challenge)
+
+    const firstTeamGameChatSyncStatus =
+      await syncGameChatsSpy.mock.results[0].value
 
     expect(firstTeamGameChatSyncStatus).toMatchObject({
       synced: expect.any(Date),
@@ -240,11 +251,12 @@ describe('TeamChannelSync (e2e)', () => {
       ],
     })
 
-    await teamPlayerService.removePlayer(teamArnold.teamId, arnold.playerId)
+    const syncSpy = jest.spyOn(teamChannelSync, 'sync')
 
-    const secondTeamGameChatSyncStatus = await teamChannelSync.syncGameChats(
-      teamArnold.teamId,
-    )
+    await teamPlayerEditHandler.removePlayer(teamArnold.teamId, arnold.playerId)
+
+    const secondTeamGameChatSyncStatus = (await syncSpy.mock.results[0].value)
+      .teamGameChatSyncStatus
 
     expect(secondTeamGameChatSyncStatus).toMatchObject({
       synced: expect.any(Date),

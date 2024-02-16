@@ -12,7 +12,8 @@ describe('TeamPlayerService', () => {
     service = module.get<TeamInviteCodeService>(TeamInviteCodeService)
   })
 
-  it('should be defined', () => {
+  it('should be defined', async () => {
+    await service.addInviteCode(1)
     expect(service).toBeDefined()
   })
 })
