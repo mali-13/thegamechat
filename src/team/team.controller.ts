@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Param, Patch } from '@nestjs/common'
-import { TeamDto } from './team.dto'
+import { Body, Controller, Get, Param, Patch, Query } from '@nestjs/common'
+import { TeamDto, TeamFindOptions } from './team.dto'
 import { TeamService } from './team.service'
 
 @Controller('teams')
@@ -12,13 +12,16 @@ export class TeamController {
   }
 
   @Get('/')
-  async find() {
-    return this.teamService.find({
+  async find(@Query() findOptions: TeamFindOptions) {
+    findOptions = {
+      ...findOptions,
       relations: {
         players: true,
         creator: true,
       },
-    })
+    }
+
+    return this.teamService.find(findOptions)
   }
 
   @Get('/:teamId')

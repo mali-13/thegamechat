@@ -6,6 +6,7 @@ import { TeamTestData } from './team.test-data'
 import { PlayerTestData } from '../player/player.test-data'
 import { PlayerModule } from '../player/player.module'
 import { TeamCreatorModule } from './team-creator/team-creator.module'
+import { TeamPlayerService } from './team-player/team-player.service'
 
 describe('TeamController (e2e)', () => {
   let app: INestApplication
@@ -15,6 +16,8 @@ describe('TeamController (e2e)', () => {
 
   let arnold
   let teamArnold
+
+  let teamPlayerService: TeamPlayerService
 
   async function initTestData() {
     arnold = await playerTestData.createPlayer({ name: 'Arnold' })
@@ -37,6 +40,9 @@ describe('TeamController (e2e)', () => {
 
     teamTestData = app.get<TeamTestData>(TeamTestData)
     playerTestData = app.get<PlayerTestData>(PlayerTestData)
+
+    teamPlayerService = app.get<TeamPlayerService>(TeamPlayerService)
+
     await initTestData()
   })
 
@@ -58,5 +64,37 @@ describe('TeamController (e2e)', () => {
       //Rule: Team is considered established if it has at least 5 players
       established: false,
     })
+  })
+
+  it('/teams?established=true (GET)', async () => {
+    const establishedTeam = await teamTestData.createTeam({
+      name: 'Established team',
+      creatorId: arnold.playerId,
+    })
+
+    const numberOfPlayersToAdd = 4
+
+    for (let i = 0; i < numberOfPlayersToAdd; i++) {
+      await teamPlayerService.addPlayer(establishedTeam.teamId, {
+        playerId: (await playerTestData.createPlayer({ name: 'Gerald' }))
+          .playerId,
+      })
+    }
+
+    const { body: teams } = await request(app.getHttpServer())
+      .get('/teams')
+      .query({ established: true })
+      .expect(200)
+
+    const team = teams.find((team) => team.teamId === establishedTeam.teamId)
+
+    expect(team).toMatchObject({
+      name: establishedTeam.name,
+      playerCount: 5,
+      //Rule: Team is considered established if it has at least 5 players
+      established: true,
+    })
+
+    expect(teams.some((team) => !team.established)).toBe(false)
   })
 })

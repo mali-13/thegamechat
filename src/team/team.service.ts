@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { TeamDto } from './team.dto'
+import { TeamDto, TeamFindOptions } from './team.dto'
 import { Team } from './team.entity'
-import { FindManyOptions, FindOneOptions, Repository } from 'typeorm'
+import { FindOneOptions, Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 
 @Injectable()
@@ -30,7 +30,7 @@ export class TeamService {
     return this.teamRepository.save(team)
   }
 
-  async find(options: FindManyOptions<Team>) {
+  async find(options?: TeamFindOptions) {
     const teams = await this.teamRepository.find(options)
 
     teams.forEach((team) => {
@@ -39,7 +39,10 @@ export class TeamService {
       team.established = team.playerCount >= 5
     })
 
-    return teams
+    return teams.filter(
+      (team) =>
+        options.established == null || team.established === options.established,
+    )
   }
 
   async findOne(options: FindOneOptions<Team>): Promise<Team> {
