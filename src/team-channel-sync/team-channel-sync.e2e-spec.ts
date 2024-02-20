@@ -12,6 +12,7 @@ import { TeamChannelSync } from './team-channel-sync'
 import { GameChatCreatorService } from '../game-chat/game-chat-creator/game-chat-creator.service'
 import { TeamCreatorModule } from '../team/team-creator/team-creator.module'
 import { TeamPlayerEditHandler } from '../team/team-player/team-player-edit-handler/team-player-edit-handler'
+import { PlayerCreatorModule } from '../player/player-creator/player-creator.module'
 
 describe('TeamChannelSync (e2e)', () => {
   let app: INestApplication
@@ -30,6 +31,7 @@ describe('TeamChannelSync (e2e)', () => {
         TeamModule,
         TeamCreatorModule,
         PlayerModule,
+        PlayerCreatorModule,
         TypeOrmModule.forFeature([Challenge]),
       ],
       providers: [TeamTestData, PlayerTestData, TeamChallengeTestData],

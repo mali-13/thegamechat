@@ -10,16 +10,16 @@ import { Team } from '../team/team.entity'
 @Entity()
 export class Player {
   @PrimaryGeneratedColumn()
-  playerId: number
+  playerId?: number
 
   @Column()
   name: string
 
   @OneToMany(() => Team, (team) => team.creator)
-  createdTeams: Team[]
+  createdTeams?: Team[]
 
   @ManyToMany(() => Team, (team) => team.players)
-  teams: Team[]
+  teams?: Team[]
 
   @Column()
   mattermostUserId: string

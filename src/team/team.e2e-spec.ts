@@ -7,6 +7,7 @@ import { PlayerTestData } from '../player/player.test-data'
 import { PlayerModule } from '../player/player.module'
 import { TeamCreatorModule } from './team-creator/team-creator.module'
 import { TeamPlayerService } from './team-player/team-player.service'
+import { PlayerCreatorModule } from '../player/player-creator/player-creator.module'
 
 describe('TeamController (e2e)', () => {
   let app: INestApplication
@@ -31,7 +32,12 @@ describe('TeamController (e2e)', () => {
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule, PlayerModule, TeamCreatorModule],
+      imports: [
+        AppModule,
+        PlayerModule,
+        PlayerCreatorModule,
+        TeamCreatorModule,
+      ],
       providers: [TeamTestData, PlayerTestData],
     }).compile()
 
@@ -76,7 +82,7 @@ describe('TeamController (e2e)', () => {
 
     for (let i = 0; i < numberOfPlayersToAdd; i++) {
       await teamPlayerService.addPlayer(establishedTeam.teamId, {
-        playerId: (await playerTestData.createPlayer({ name: 'Gerald' }))
+        playerId: (await playerTestData.createPartial({ name: 'Gerald' }))
           .playerId,
       })
     }

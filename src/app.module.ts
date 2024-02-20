@@ -13,10 +13,12 @@ import { GameChatModule } from './game-chat/game-chat.module'
 import { TeamChannelSyncModule } from './team-channel-sync/team-channel-sync.module'
 import { TeamPlayerEditHandlerModule } from './team/team-player/team-player-edit-handler/team-player-edit-handler.module'
 import { TeamCreatorModule } from './team/team-creator/team-creator.module'
+import { PlayerCreatorModule } from './player/player-creator/player-creator.module'
 
 @Module({
   imports: [
     PlayerModule,
+    PlayerCreatorModule,
     TeamModule,
     TeamInviteCodeModule,
     TeamChallengeModule,

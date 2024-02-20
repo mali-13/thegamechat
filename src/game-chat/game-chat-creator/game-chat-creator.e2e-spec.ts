@@ -5,11 +5,12 @@ import { Challenge, ChallengeStatus } from '../../challenge/challenge.entity'
 import { TeamTestData } from '../../team/team.test-data'
 import { TeamModule } from '../../team/team.module'
 import { PlayerTestData } from '../../player/player.test-data'
-import { PlayerModule } from '../../player/player.module'
 import { TeamChallengeTestData } from '../../team/team-challenge/team-challenge.test-data'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { GameChatCreatorService } from './game-chat-creator.service'
 import { TeamCreatorModule } from '../../team/team-creator/team-creator.module'
+import { PlayerCreatorModule } from '../../player/player-creator/player-creator.module'
+import { PlayerModule } from '../../player/player.module'
 
 describe('GameChatCreatorService (e2e)', () => {
   let app: INestApplication
@@ -26,6 +27,7 @@ describe('GameChatCreatorService (e2e)', () => {
         TeamModule,
         TeamCreatorModule,
         PlayerModule,
+        PlayerCreatorModule,
         TypeOrmModule.forFeature([Challenge]),
       ],
       providers: [TeamTestData, PlayerTestData, TeamChallengeTestData],
