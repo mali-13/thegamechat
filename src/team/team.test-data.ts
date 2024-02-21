@@ -6,6 +6,7 @@ import { TeamDto } from './team.dto'
 export class TeamTestData {
   defaultTeam: TeamDto = {
     about: 'The killer team from Kosovo',
+    location: 'Shkoder',
     creatorId: 1,
     name: 'The killers',
   }

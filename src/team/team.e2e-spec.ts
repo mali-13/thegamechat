@@ -27,6 +27,7 @@ describe('TeamController (e2e)', () => {
     teamArnold = await teamTestData.createTeam({
       name: 'Team Arnold',
       creatorId: arnold.playerId,
+      location: 'HillWood',
     })
   }
 
@@ -69,6 +70,7 @@ describe('TeamController (e2e)', () => {
       playerCount: 1,
       //Rule: Team is considered established if it has at least 5 players
       established: false,
+      location: 'HillWood',
     })
   })
 

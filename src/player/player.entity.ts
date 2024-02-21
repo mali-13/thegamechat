@@ -15,6 +15,9 @@ export class Player {
   @Column()
   name: string
 
+  @Column()
+  location: string
+
   @OneToMany(() => Team, (team) => team.creator)
   createdTeams?: Team[]
 

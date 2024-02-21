@@ -28,6 +28,7 @@ export class TeamCreatorService {
     const team = new Team()
     team.name = teamDto.name
     team.about = teamDto.about
+    team.location = teamDto.location
     team.creator = creator
 
     const mattermostTeamName =

@@ -20,6 +20,8 @@ export class Team {
   @Column()
   about: string
   @Column()
+  location: string
+  @Column()
   channelId: string
 
   established: boolean

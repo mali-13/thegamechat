@@ -22,6 +22,7 @@ export class TeamService {
 
     team.name = teamDto.name
     team.about = teamDto.about
+    team.location = teamDto.location
 
     return this.teamRepository.save(team)
   }

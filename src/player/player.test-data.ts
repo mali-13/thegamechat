@@ -9,6 +9,7 @@ export class PlayerTestData {
   defaultPartialPlayer: Player = {
     name: 'Eric Fromm',
     mattermostUserId: 'test-mattermost-user-id',
+    location: 'Shkoder',
   }
 
   constructor(
@@ -26,6 +27,7 @@ export class PlayerTestData {
   defaultPlayer: CreatePlayerDto = {
     name: 'Eric Fromm',
     password: '555222',
+    location: 'Shkoder',
   }
 
   createPlayer(player: Partial<CreatePlayerDto>) {

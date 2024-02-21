@@ -1,4 +1,10 @@
-import { IsNumber, IsOptional, IsString, MinLength } from 'class-validator'
+import {
+  IsNumber,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator'
 import { PartialType } from '@nestjs/mapped-types'
 
 export class CreatePlayerDto {
@@ -8,6 +14,11 @@ export class CreatePlayerDto {
 
   @IsString()
   name: string
+
+  @MinLength(1)
+  @MaxLength(56)
+  @IsString()
+  location: string
 
   @MinLength(6)
   password: string

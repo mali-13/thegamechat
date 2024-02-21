@@ -21,6 +21,7 @@ export class PlayerCreatorService {
         email: `${username}@generated.com`,
         username: `${username}`,
         password: playerDto.password,
+        nickname: playerDto.name,
       },
       '',
       '',
@@ -33,6 +34,7 @@ export class PlayerCreatorService {
     const player = new Player()
     player.name = playerDto.name
     player.mattermostUserId = mattermostUser.id
+    player.location = playerDto.location
     return await this.playerService.save(player)
   }
 }
