@@ -30,6 +30,7 @@ export class Team {
   creator: Player
 
   playerCount: number
+  playerAverageAge: number
 
   @ManyToMany(() => Player, (player) => player.teams)
   @JoinTable()

@@ -68,6 +68,7 @@ describe('TeamController (e2e)', () => {
     expect(team).toMatchObject({
       name: teamArnold.name,
       playerCount: 1,
+      playerAverageAge: 18,
       //Rule: Team is considered established if it has at least 5 players
       established: false,
       location: 'HillWood',

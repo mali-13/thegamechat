@@ -3,6 +3,7 @@ import { TeamDto, TeamFindOptions } from './team.dto'
 import { Team } from './team.entity'
 import { FindOneOptions, Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
+import * as _ from 'lodash'
 
 @Injectable()
 export class TeamService {
@@ -36,6 +37,7 @@ export class TeamService {
 
     teams.forEach((team) => {
       team.playerCount = team.players.length
+      team.playerAverageAge = _.meanBy(team.players, (player) => player.age)
       //Rule: Team is considered established if it has at least 5 players
       team.established = team.playerCount >= 5
     })
