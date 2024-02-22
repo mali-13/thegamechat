@@ -16,6 +16,9 @@ export class Player {
   name: string
 
   @Column()
+  age?: number
+
+  @Column()
   location: string
 
   @OneToMany(() => Team, (team) => team.creator)

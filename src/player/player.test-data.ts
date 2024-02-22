@@ -10,6 +10,7 @@ export class PlayerTestData {
     name: 'Eric Fromm',
     mattermostUserId: 'test-mattermost-user-id',
     location: 'Shkoder',
+    age: 18,
   }
 
   constructor(
@@ -28,6 +29,7 @@ export class PlayerTestData {
     name: 'Eric Fromm',
     password: '555222',
     location: 'Shkoder',
+    age: 18,
   }
 
   createPlayer(player: Partial<CreatePlayerDto>) {
