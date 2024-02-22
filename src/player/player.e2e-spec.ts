@@ -5,7 +5,7 @@ import { PlayerModule } from './player.module'
 import { PlayerService } from './player.service'
 import { Player } from './player.entity'
 
-describe('TeamController (e2e)', () => {
+describe('Player (e2e)', () => {
   let app: INestApplication
 
   let playerService: PlayerService

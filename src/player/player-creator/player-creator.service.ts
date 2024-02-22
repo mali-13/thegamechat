@@ -35,6 +35,7 @@ export class PlayerCreatorService {
     player.name = playerDto.name
     player.mattermostUserId = mattermostUser.id
     player.location = playerDto.location
+    player.age = playerDto.age
     return await this.playerService.save(player)
   }
 }
